@@ -1,10 +1,10 @@
 // ==UserScript==
 // @name Kigard Clan GPS
-// @author Fergal
-// @contributor
+// @author Fergal <ffeerrggaall@gmail.com>
+// @contributor Ciol <ciolfire@gmail.com> (100% inspiré de Kigard Fashion Script)
 // @contributor
 // @description Un script facilitant la localisation des membres du clan
-// @version 27.1
+// @version 0.1
 // @grant GM_addStyle
 // @match https://tournoi.kigard.fr/index.php?p=clan&g=membres
 // @exclude 
