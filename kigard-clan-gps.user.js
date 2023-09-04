@@ -6,7 +6,7 @@
 // @description Un script facilitant la localisation des membres du clan
 // @version 0.1
 // @grant GM_addStyle
-// @match https://tournoi.kigard.fr/index.php?p=clan&g=membres
+// @match hhttps://tournoi.kigard.fr/*
 // @exclude 
 // ==/UserScript==
 
@@ -40,12 +40,19 @@ console.log(mypos);
 
 if (page == "clan" && urlParams.get('g') == "membres") {
    console.log(page)
-   getPosition();
+   getPositions();
 }
 
-function getPosition() {
-  /* -- BEGIN : Applique les skins sur la liste des personnages -----*/
-  //Récupère la liste des PJ
+
+function getMap() {
+
+
+
+}
+
+// get members position from page clan->membres
+function getPositions() {
+  // in the 8th column
   let xpath = '//tbody/tr[*]/td[8]';
   let lines = document.evaluate(xpath, document.documentElement, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
   for (var i=0;i < lines.snapshotLength;i++) {
@@ -53,9 +60,8 @@ function getPosition() {
     let pos = parsePosition(line.textContent.trim());
     // console.log(pos);
     let prevHTML = line.innerHTML;
-    // console.log(prevHTML);
-    line.innerHTML = "<div>" + prevHTML + "</div> <div>(" + distance(pos,mypos) + " cases " + direction(angle(pos,mypos)) + ")</div>";//.format(distance(pos,mypos));
-
+    console.log(prevHTML);
+    line.innerHTML = "<div>" + prevHTML + "</div><div>&nbsp;(" + distance(pos,mypos) + " cases " + direction(angle(pos,mypos)) + ")&nbsp;</div>";//.format(distance(pos,mypos));
     // if (customList.includes(PJ)) {
     //   let customImg = encodeURI(`https://raw.githubusercontent.com/Ciolfire/kigard-fashion-script/main/${period}/${PJ}.gif`);
     //   let img = document.evaluate('.//img', line , null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
