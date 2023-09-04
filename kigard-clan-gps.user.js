@@ -1,12 +1,12 @@
 // ==UserScript==
-// @name Kigard Clan GPS
+// @name kigard-clan-gps
 // @author Fergal <ffeerrggaall@gmail.com>
 // @contributor Ciol <ciolfire@gmail.com> (100% inspiré de Kigard Fashion Script)
 // @contributor
 // @description Un script facilitant la localisation des membres du clan
-// @version 0.1
+// @version 0.3
 // @grant GM_addStyle
-// @match hhttps://tournoi.kigard.fr/*
+// @match https://tournoi.kigard.fr/*
 // @exclude 
 // ==/UserScript==
 
@@ -29,18 +29,24 @@ if (typeof GM_addStyle == 'undefined') {
 
 
 
-var mypos;
+var mypos, myname;
+var listNames;
 const queryString = window.location.search;
 const urlParams = new URLSearchParams(queryString);
 const page = urlParams.get('p')
 
-let test = document.getElementsByClassName("margin_position");
-mypos = parsePosition(test[0].innerText.trim());
-console.log(mypos);
+let top = document.getElementsByClassName("margin_position");
+mypos = parsePosition(top[0].innerText.trim());
+//console.log(mypos);
+top = document.getElementsByClassName("inline");
+myname = top[0].innerText.trim().split(' ')[0];
+//console.log(myname);
+
 
 if (page == "clan" && urlParams.get('g') == "membres") {
-   console.log(page)
-   getPositions();
+    console.log(page)
+    listNames = getNames();
+    getPositions();
 }
 
 
@@ -50,25 +56,38 @@ function getMap() {
 
 }
 
+// get members name from page clan->membres
+function getNames() {
+    // in the 1th column
+    let xpath = '//tbody/tr[*]/td[2]';
+    let lines = document.evaluate(xpath, document.documentElement, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
+    let listNames = Array();
+    for (var i=0;i < lines.snapshotLength;i++) {
+        let line = lines.snapshotItem(i);
+        listNames[i] = line.textContent.trim();
+    }
+    return listNames;
+}
+
 // get members position from page clan->membres
 function getPositions() {
   // in the 8th column
   let xpath = '//tbody/tr[*]/td[8]';
   let lines = document.evaluate(xpath, document.documentElement, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
   for (var i=0;i < lines.snapshotLength;i++) {
-    let line = lines.snapshotItem(i);
-    let pos = parsePosition(line.textContent.trim());
-    // console.log(pos);
-    let prevHTML = line.innerHTML;
-    console.log(prevHTML);
-    line.innerHTML = "<div>" + prevHTML + "</div><div>&nbsp;(" + distance(pos,mypos) + " cases " + direction(angle(pos,mypos)) + ")&nbsp;</div>";//.format(distance(pos,mypos));
-    // if (customList.includes(PJ)) {
-    //   let customImg = encodeURI(`https://raw.githubusercontent.com/Ciolfire/kigard-fashion-script/main/${period}/${PJ}.gif`);
-    //   let img = document.evaluate('.//img', line , null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
-    //   img.src= customImg;
-    // }
+      if(listNames[i] != myname) {
+          let line = lines.snapshotItem(i);
+          let pos = parsePosition(line.textContent.trim());
+          let dis = distance(pos,mypos);
+          let ang = angle(pos,mypos);
+          let dir = direction(ang);
+          //console.log(ang);
+          let prevHTML = line.innerHTML;
+          line.innerHTML = "<div class='grille-membres'><div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
+                         + "<img src='https://raw.githubusercontent.com/syltou/kigard-clan-gps/main/compass2.png' style='transform:rotate(" + (-1*ang) + "deg);'></div><div>"
+                         + prevHTML + "</div><div>&nbsp;(" + dis + " cases " + dir + ")&nbsp;</div></div>";//.format(distance(pos,mypos));
+      }
   }
-  /* -- END   : Applique les skins sur la liste des personnages -----*/
 }
 
 
@@ -87,7 +106,6 @@ function distance(vec1, vec2){
 function angle(vec1, vec2){
     let dx = (vec1[0]-vec2[0]);
     let dy = (vec1[1]-vec2[1]);
-        console.log(dx,dy);
     return (Math.atan2(dy, dx) * 180) / Math.PI;
 }
 
