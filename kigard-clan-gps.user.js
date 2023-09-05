@@ -37,14 +37,11 @@ const page = urlParams.get('p')
 
 let top = document.getElementsByClassName("margin_position");
 mypos = parsePosition(top[0].innerText.trim());
-//console.log(mypos);
-top = document.getElementsByClassName("inline");
-myname = top[0].innerText.trim().split(' ')[0];
-//console.log(myname);
+let name = document.getElementsByTagName("strong");
+myname = name[0].innerText.trim();
 
 
 if (page == "clan" && urlParams.get('g') == "membres") {
-    console.log(page)
     listNames = getNames();
     getPositions();
 }
@@ -75,17 +72,22 @@ function getPositions() {
   let xpath = '//tbody/tr[*]/td[8]';
   let lines = document.evaluate(xpath, document.documentElement, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
   for (var i=0;i < lines.snapshotLength;i++) {
+      let line = lines.snapshotItem(i);
+      let pos = parsePosition(line.textContent.trim());
+      let dis = distance(pos,mypos);
+      let ang = angle(pos,mypos);
+      let dir = direction(ang);
+      //console.log(ang);
+      let prevHTML = line.innerHTML;
       if(listNames[i] != myname) {
-          let line = lines.snapshotItem(i);
-          let pos = parsePosition(line.textContent.trim());
-          let dis = distance(pos,mypos);
-          let ang = angle(pos,mypos);
-          let dir = direction(ang);
-          //console.log(ang);
-          let prevHTML = line.innerHTML;
           line.innerHTML = "<div class='grille-membres'><div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
                          + "<img src='https://raw.githubusercontent.com/syltou/kigard-clan-gps/main/compass2.png' style='transform:rotate(" + (-1*ang) + "deg);'></div><div>"
                          + prevHTML + "</div><div>&nbsp;(" + dis + " cases " + dir + ")&nbsp;</div></div>";//.format(distance(pos,mypos));
+      }
+      else {
+          line.innerHTML = "<div class='grille-membres'><div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
+                         + "<img src='https://raw.githubusercontent.com/syltou/kigard-clan-gps/main/compass2.gif'></div><div>"
+                         + prevHTML + "</div><div>&nbsp;(Vous êtes ici)&nbsp;</div></div>";
       }
   }
 }
