@@ -4,7 +4,7 @@
 // @contributor Ciol <ciolfire@gmail.com> (100% inspiré de Kigard Fashion Script)
 // @contributor
 // @description Un script facilitant la localisation des membres du clan
-// @version 0.4
+// @version 0.5
 // @grant GM_addStyle
 // @match https://tournoi.kigard.fr/*
 // @exclude 
@@ -33,22 +33,30 @@ var mypos, myname;
 var listNames, buttons;
 const queryString = window.location.search;
 const urlParams = new URLSearchParams(queryString);
-const page = urlParams.get('p')
+const page = urlParams.get('p');
+const subp = urlParams.get('g');
+const inv = urlParams.get('genre');
+
+if(sessionStorage.getItem("show_eq")==null) sessionStorage.setItem("show_eq",1);
+if(sessionStorage.getItem("show_co")==null) sessionStorage.setItem("show_co",1);
+if(sessionStorage.getItem("show_re")==null) sessionStorage.setItem("show_re",1);
 
 let top = document.getElementsByClassName("margin_position");
 mypos = parsePosition(top[0].innerText.trim());
 let name = document.getElementsByTagName("strong");
 myname = name[0].innerText.trim();
 
-changeMenu()
 
-if(page == "empathie") {
+
+if (page == "empathie") {
     addButtonEmpathie();
 }
 
+if (page == "inventaire" && (inv == "Equipement" || inv == "Consommable" || inv == "Ressource")) {
+    saveInventory(inv);
+}
 
-
-if (page == "clan" && urlParams.get('g') == "membres") {
+if (page == "clan" && subp == "membres") {
     listNames = getNames();
     getPositions();
     localStorage.setItem("members",members);
@@ -63,15 +71,48 @@ if (page == 'vue') {
 }
 
 if (page == 'InventaireComplet') {
+    let state_eq, state_co, state_re;
+    if(urlParams.get('Equipement')=='on') {
+        sessionStorage.setItem("show_eq",1);
+        state_eq = 'checked="checked"';
+    }
+    else{
+        sessionStorage.setItem("show_eq",0);
+        state_eq = '';
+    }
+    if(urlParams.get('Consommable')=='on') {
+        sessionStorage.setItem("show_co",1);
+        state_co = 'checked="checked"';
+    }
+    else{
+        sessionStorage.setItem("show_co",0);
+        state_co = '';
+    }
+    if(urlParams.get('Ressource')=='on') {
+        sessionStorage.setItem("show_re",1);
+        state_re = 'checked="checked"';
+    }
+    else{
+        sessionStorage.setItem("show_re",0);
+        state_re = '';
+    }
 
-    var bloc = document.getElementById("bloc");
-    bloc.innerHTML = '\n<h3>Inventaire Complet</h3>\n\n<form name="form_inventaire" method="post" action="index.php?p=InventaireComplet"><input name="refresh_inventaire" type="submit" value="Rafraîchir"></form>';
+    let bloc = document.getElementById("bloc");
+    bloc.innerHTML = "\n<h3>Inventaire complet (sauf tenue)</h3>\n\n"
+    + '<form id="form_inv" method="get" formaction="index.php?p=InventaireComplet">'
+    + '<input type="hidden" name="p"  value="' + page + '" />'
+    + '<input type="checkbox" name="Equipement" value="on" ' + state_eq + ' form="form_inv"/>&nbsp;Équipements &nbsp;&nbsp;'
+    + '<input type="checkbox" name="Consommable" value="on" ' + state_co + ' form="form_inv"/>&nbsp;Consommables &nbsp;&nbsp;'
+    + '<input type="checkbox" name="Ressource" value="on" ' + state_re + ' form="form_inv"/>&nbsp;Ressources &nbsp;&nbsp;'
+    + '<input name="refresh_inv" type="submit" value="Modifier" form="form_inv"></form>';
+
     // console.log(bloc);
-    mergeInventory();
+    let table = mergeInventory();
+    bloc.innerHTML += table;
 
 }
 
-
+changeMenu();
 
 if (page == "arene") {
     orderArenas();
@@ -95,9 +136,42 @@ function updateView(members) {
 
 }
 
+
+function saveInventory(inv) {
+    var i, lines, cell, table;
+    lines = document.getElementsByTagName('table')[0].getElementsByClassName("item");
+    console.log(lines.length)
+    table = "";
+    for (i=0;i<lines.length;i++){
+        table += "<tr>";
+        if(lines[i].parentNode.tagName == "TD") {
+            cell = lines[i].parentNode.outerHTML;
+            table += cell;
+        }
+        table += "</tr>";
+    }
+    // table += "</table>";
+    sessionStorage.setItem(inv,table);
+
+}
+
 function mergeInventory() {
 
-    console.log("HELLO");
+    let i, table;
+    // let inv = urlParams.get('genre');
+
+    let inv_to_show = [];
+    if(sessionStorage.getItem("show_eq")==1) inv_to_show.push("Equipement");
+    if(sessionStorage.getItem("show_co")==1) inv_to_show.push("Consommable");
+    if(sessionStorage.getItem("show_re")==1) inv_to_show.push("Ressource");
+    let merged = '<table width="100%"><tbody>';
+    for(i=0; i<inv_to_show.length; i++){
+        table = sessionStorage.getItem(inv_to_show[i]);
+        merged += table;
+    }
+    merged += "</tbody></table>";
+    return merged;
+
 }
 
 
@@ -131,10 +205,16 @@ function changeMenu() {
     var i, menu, submenus, list, temp;
     menu = document.getElementById("menu");
     submenus = menu.getElementsByClassName("parent");
+
+    var url = '';
+    if(sessionStorage.getItem("show_eq")==1) url += '&Equipement=on';
+    if(sessionStorage.getItem("show_co")==1) url += '&Consommable=on';
+    if(sessionStorage.getItem("show_re")==1) url += '&Ressource=on';
+
     for (i=0;i<submenus.length;i++){
         if(submenus[i].innerText == "Inventaire"){
             list = submenus[i].parentNode.getElementsByTagName("ul");
-            temp = list[0].innerHTML.slice(0,-5) + '<li><a href="index.php?p=InventaireComplet">Tout</a></li>' + list[0].innerHTML.slice(-5);
+            temp = list[0].innerHTML.slice(0,-5) + '<li><a href="index.php?p=InventaireComplet' + url + '">Tout</a></li>' + list[0].innerHTML.slice(-5);
             list[0].innerHTML = temp
             // console.log(list[0]);
         }
