@@ -30,7 +30,7 @@ if (typeof GM_addStyle == 'undefined') {
 
 var members =[];
 var mypos, myname;
-var listNames;
+var listNames, buttons;
 const queryString = window.location.search;
 const urlParams = new URLSearchParams(queryString);
 const page = urlParams.get('p')
@@ -39,6 +39,13 @@ let top = document.getElementsByClassName("margin_position");
 mypos = parsePosition(top[0].innerText.trim());
 let name = document.getElementsByTagName("strong");
 myname = name[0].innerText.trim();
+
+changeMenu()
+
+if(page == "empathie") {
+    addButtonEmpathie();
+}
+
 
 
 if (page == "clan" && urlParams.get('g') == "membres") {
@@ -54,6 +61,16 @@ if (page == 'vue') {
     //     updateView(members);
 
 }
+
+if (page == 'InventaireComplet') {
+
+    var bloc = document.getElementById("bloc");
+    bloc.innerHTML = '\n<h3>Inventaire Complet</h3>\n\n<form name="form_inventaire" method="post" action="index.php?p=InventaireComplet"><input name="refresh_inventaire" type="submit" value="Rafraîchir"></form>';
+    // console.log(bloc);
+    mergeInventory();
+
+}
+
 
 
 if (page == "arene") {
@@ -78,6 +95,53 @@ function updateView(members) {
 
 }
 
+function mergeInventory() {
+
+    console.log("HELLO");
+}
+
+
+function addButtonEmpathie() {
+    var poFields, posFields, submitButton, i, codeButton;
+    submitButton = document.getElementsByName("modif_suivant");
+    if(submitButton.length==1){
+        codeButton = "&nbsp;&nbsp;" + submitButton[0].outerHTML;
+    } else {
+        codeButton = " ";
+    }
+
+    posFields = document.getElementsByClassName("pos");
+    for(i=0;i<posFields.length;i=i+2){
+        // posFields[i].parentNode.innerHTML += '&nbsp;&nbsp;<input name="reset_pos" value="Reset" type="reset">';
+        posFields[i].parentNode.innerHTML += codeButton;
+    }
+
+    poFields = document.getElementsByClassName("po");
+    for(i=0;i<poFields.length;i++){
+        if(poFields[i].tagName == "INPUT"){
+            poFields[i].parentNode.innerHTML += codeButton;
+        }
+    }
+}
+
+
+
+function changeMenu() {
+
+    var i, menu, submenus, list, temp;
+    menu = document.getElementById("menu");
+    submenus = menu.getElementsByClassName("parent");
+    for (i=0;i<submenus.length;i++){
+        if(submenus[i].innerText == "Inventaire"){
+            list = submenus[i].parentNode.getElementsByTagName("ul");
+            temp = list[0].innerHTML.slice(0,-5) + '<li><a href="index.php?p=InventaireComplet">Tout</a></li>' + list[0].innerHTML.slice(-5);
+            list[0].innerHTML = temp
+            // console.log(list[0]);
+        }
+    }
+    // console.log(menu.innerText);
+
+}
 
 function getMap() {
 }
