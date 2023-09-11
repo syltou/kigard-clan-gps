@@ -4,7 +4,7 @@
 // @contributor Ciol <ciolfire@gmail.com> (100% inspiré de Kigard Fashion Script)
 // @contributor
 // @description Un script facilitant la localisation des membres du clan
-// @version 0.3
+// @version 0.4
 // @grant GM_addStyle
 // @match https://tournoi.kigard.fr/*
 // @exclude 
@@ -28,7 +28,7 @@ if (typeof GM_addStyle == 'undefined') {
 }
 
 
-
+var members =[];
 var mypos, myname;
 var listNames;
 const queryString = window.location.search;
@@ -44,13 +44,42 @@ myname = name[0].innerText.trim();
 if (page == "clan" && urlParams.get('g') == "membres") {
     listNames = getNames();
     getPositions();
+    localStorage.setItem("members",members);
+    sessionStorage.setItem("fetched",1);
+}
+
+if (page == 'vue') {
+    // if(sessionStorage.getItem("fetched")){
+    //     members = localStorage.getItem("members");
+    //     updateView(members);
+
+}
+
+
+if (page == "arene") {
+    orderArenas();
+}
+
+function orderArenas() {
+    var name, arenas, title, x, y, i, arenapos, temp;
+    arenas = document.getElementsByClassName("ddTitleText");
+    for (i=0;i<arenas.length;i++){
+        title = arenas[i].innerText;
+        temp = title.split(':');
+        x = temp[1].split(' ')[0];
+        y = temp[2].split(']')[0];
+        arenapos = Array(~~x,~~y);
+        arenas[i].innerText += " (" + distance(arenapos,mypos) + " " + direction(angle(arenapos,mypos),1) + ")";
+    }
+}
+
+function updateView(members) {
+
+
 }
 
 
 function getMap() {
-
-
-
 }
 
 // get members name from page clan->membres
@@ -67,6 +96,7 @@ function getNames() {
 }
 
 // get members position from page clan->membres
+
 function getPositions() {
   // in the 8th column
   let xpath = '//tbody/tr[*]/td[8]';
@@ -89,6 +119,7 @@ function getPositions() {
                          + "<img src='https://raw.githubusercontent.com/syltou/kigard-clan-gps/main/compass2.gif'></div><div>"
                          + prevHTML + "</div><div>&nbsp;(Vous êtes ici)&nbsp;</div></div>";
       }
+      members.push([listNames[i],pos]);
   }
 }
 
@@ -111,22 +142,32 @@ function angle(vec1, vec2){
     return (Math.atan2(dy, dx) * 180) / Math.PI;
 }
 
-function direction(angle){
+function direction(angle,short=0){
     if (angle<=22.5 && angle>-22.5){
-        return "à l'Est";
+        if(short) return "E";
+        else return "à l'Est";
     } else if (angle<=67.5 && angle>22.5){
-        return "au Nord-Est";
+        if(short) return "NE";
+        else return "au Nord-Est";
     } else if (angle<=112.5 && angle>67.5){
-        return "au Nord";
+        if(short) return "N";
+        else return "au Nord";
     } else if (angle<=157.5 && angle>112.5){
-        return "au Nord-Ouest";
+        if(short) return "NO";
+        else return "au Nord-Ouest";
     } else if (angle<=-157.5 || angle>157.5){
-        return "à l'Ouest";
+        if(short) return "O";
+        else return "à l'Ouest";
     } else if (angle<=-112.5 && angle>-157.5){
-        return "au Sud-Ouest";
+        if(short) return "SO";
+        else return "au Sud-Ouest";
     } else if (angle<=-67.5 && angle>-112.5){
-        return "au Sud";
+        if(short) return "S";
+        else return "au Sud";
     } else if (angle<=-22.5 && angle>-67.5){
-        return "au Sud-Est";
+        if(short) return "SE";
+        else return "au Sud-Est";
     }
 }
+
+
