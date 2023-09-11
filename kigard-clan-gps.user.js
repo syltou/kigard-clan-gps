@@ -167,7 +167,12 @@ function mergeInventory() {
     let merged = '<table width="100%"><tbody>';
     for(i=0; i<inv_to_show.length; i++){
         table = sessionStorage.getItem(inv_to_show[i]);
-        merged += table;
+        if(table==null){
+            merged += "Visitez la page " + inv_to_show[i] + " d'abord !<br>";
+        }
+        else {
+            merged += table;
+        }
     }
     merged += "</tbody></table>";
     return merged;
