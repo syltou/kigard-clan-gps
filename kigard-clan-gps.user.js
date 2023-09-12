@@ -27,8 +27,7 @@ if (typeof GM_addStyle == 'undefined') {
   };
 }
 
-
-var members =[];
+var members = [];
 var mypos, myname;
 var listNames, buttons;
 const queryString = window.location.search;
@@ -49,12 +48,19 @@ myname = name[0].innerText.trim();
 
 
 if (page == "empathie") {
+    findMules();
     addButtonEmpathie();
 }
 
 if (page == "inventaire" && (inv == "Equipement" || inv == "Consommable" || inv == "Ressource")) {
     saveInventory(inv);
 }
+
+if (page == "gestion_stock") {
+    let mule = urlParams.get('id_monstre');
+    saveInventory(mule);
+}
+
 
 if (page == "clan" && subp == "membres") {
     listNames = getNames();
@@ -71,7 +77,106 @@ if (page == 'vue') {
 }
 
 if (page == 'InventaireComplet') {
-    let state_eq, state_co, state_re;
+    createInventory();
+
+}
+
+changeMenu();
+
+if (page == "arene") {
+    orderArenas();
+}
+
+function orderArenas() {
+    var name, arenas, title, x, y, i, arenapos, temp;
+    arenas = document.getElementsByClassName("ddTitleText");
+    for (i=0;i<arenas.length;i++){
+        title = arenas[i].innerText;
+        temp = title.split(':');
+        x = temp[1].split(' ')[0];
+        y = temp[2].split(']')[0];
+        arenapos = Array(~~x,~~y);
+        arenas[i].innerText += " (" + distance(arenapos,mypos) + " " + direction(angle(arenapos,mypos),1) + ")";
+    }
+}
+
+function updateView(members) {
+
+}
+
+
+function findMules() {
+    let mules = [];
+    let form = document.getElementsByTagName("form");
+    if(form.length==0) return;
+    form = form[form.length-1];
+    let muleIcons = document.querySelectorAll('[title="Mulet"]');
+    for(var i=0;i<muleIcons.length;i++){
+        let mule = muleIcons[0].parentNode.getElementsByClassName("profil_popin")[0].href.split("id=")[1].split("&")[0];
+        mules.push(mule);
+        mules.push(mule);
+    }
+    console.log(mules)
+    localStorage.setItem("mules",mules);
+    let mules2 = localStorage.getItem("mules");
+    console.log(mules2)
+}
+
+function saveInventory(inv) {
+    var i, lines, cell, table;
+    lines = document.getElementsByTagName('table')[0].getElementsByClassName("item");
+    // console.log(lines.length)
+    table = "";
+    for (i=0;i<lines.length;i++){
+        table += "<tr>";
+        if(lines[i].parentNode.tagName == "TD") {
+            cell = lines[i].parentNode.outerHTML;
+            table += cell;
+        }
+        table += "</tr>";
+    }
+    sessionStorage.setItem(inv,table);
+
+}
+
+function mergeInventory() {
+
+    let i, table;
+    let mules = localStorage.getItem("mules");
+    console.log(mules);
+
+    let inv_to_show = [];
+    if(sessionStorage.getItem("show_eq")==1) inv_to_show.push("Equipement");
+    if(sessionStorage.getItem("show_co")==1) inv_to_show.push("Consommable");
+    if(sessionStorage.getItem("show_re")==1) inv_to_show.push("Ressource");
+    console.log(inv_to_show);
+
+    let merged = '<table width="100%"><tbody>';
+    for(i=0; i<inv_to_show.length; i++){
+        table = sessionStorage.getItem(inv_to_show[i]);
+        if(table==null){
+            merged += "Visitez d'abord la page " + inv_to_show[i] + " !<br>";
+        }
+        else {
+            merged += table;
+        }
+    }
+    for(i=0; i<mules.length; i++){
+        table = sessionStorage.getItem(mules[i]);
+        if(table==null){
+            merged += "Visitez d'abord l'inventaire du mulet " + mules[i] + " !<br>";
+        }
+        else {
+            merged += table;
+        }
+    }
+    merged += "</tbody></table>";
+    return merged;
+
+}
+
+function createInventory() {
+     let state_eq, state_co, state_re;
     if(urlParams.get('Equipement')=='on') {
         sessionStorage.setItem("show_eq",1);
         state_eq = 'checked="checked"';
@@ -109,74 +214,6 @@ if (page == 'InventaireComplet') {
     // console.log(bloc);
     let table = mergeInventory();
     bloc.innerHTML += table;
-
-}
-
-changeMenu();
-
-if (page == "arene") {
-    orderArenas();
-}
-
-function orderArenas() {
-    var name, arenas, title, x, y, i, arenapos, temp;
-    arenas = document.getElementsByClassName("ddTitleText");
-    for (i=0;i<arenas.length;i++){
-        title = arenas[i].innerText;
-        temp = title.split(':');
-        x = temp[1].split(' ')[0];
-        y = temp[2].split(']')[0];
-        arenapos = Array(~~x,~~y);
-        arenas[i].innerText += " (" + distance(arenapos,mypos) + " " + direction(angle(arenapos,mypos),1) + ")";
-    }
-}
-
-function updateView(members) {
-
-
-}
-
-
-function saveInventory(inv) {
-    var i, lines, cell, table;
-    lines = document.getElementsByTagName('table')[0].getElementsByClassName("item");
-    console.log(lines.length)
-    table = "";
-    for (i=0;i<lines.length;i++){
-        table += "<tr>";
-        if(lines[i].parentNode.tagName == "TD") {
-            cell = lines[i].parentNode.outerHTML;
-            table += cell;
-        }
-        table += "</tr>";
-    }
-    // table += "</table>";
-    sessionStorage.setItem(inv,table);
-
-}
-
-function mergeInventory() {
-
-    let i, table;
-    // let inv = urlParams.get('genre');
-
-    let inv_to_show = [];
-    if(sessionStorage.getItem("show_eq")==1) inv_to_show.push("Equipement");
-    if(sessionStorage.getItem("show_co")==1) inv_to_show.push("Consommable");
-    if(sessionStorage.getItem("show_re")==1) inv_to_show.push("Ressource");
-    let merged = '<table width="100%"><tbody>';
-    for(i=0; i<inv_to_show.length; i++){
-        table = sessionStorage.getItem(inv_to_show[i]);
-        if(table==null){
-            merged += "Visitez la page " + inv_to_show[i] + " d'abord !<br>";
-        }
-        else {
-            merged += table;
-        }
-    }
-    merged += "</tbody></table>";
-    return merged;
-
 }
 
 
