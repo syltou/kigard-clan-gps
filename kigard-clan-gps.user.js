@@ -4,7 +4,7 @@
 // @contributor Ciol <ciolfire@gmail.com> (100% inspiré de Kigard Fashion Script)
 // @contributor
 // @description Un script facilitant la localisation des membres du clan
-// @version 0.5
+// @version 0.5.2
 // @grant GM_addStyle
 // @match https://tournoi.kigard.fr/*
 // @exclude 
@@ -36,9 +36,23 @@ const page = urlParams.get('p');
 const subp = urlParams.get('g');
 const inv = urlParams.get('genre');
 
-if(sessionStorage.getItem("show_eq")==null) sessionStorage.setItem("show_eq",1);
-if(sessionStorage.getItem("show_co")==null) sessionStorage.setItem("show_co",1);
-if(sessionStorage.getItem("show_re")==null) sessionStorage.setItem("show_re",1);
+var id_equip = [1,2,7,8,9,10,11,14,16,17,18,19,20,21,22,23,24,25,27,28,29,30,31,32,33,
+               34,39,47,48,49,50,51,52,53,54,55,56,57,58,59,60,62,64,74,75,76,77,78,
+               79,80,81,82,83,84,85,86,87,91,92,93,95,98,99,100,101,102,103,104,105,
+               106,107,108,109,110,111,114,115,116,117,118,119,120,121,122,123,124,
+               125,126,127,128,129,130,136,137,138,140,141,146,147,148,149,150,151,
+               152,155,156,157,160,161,162,163,166,167,168,170,177,181,182,183,184,
+               185,186,188,189,190,191,192,193,194,195,196,197,198,199,200,201,202,
+               203,204,205,206,207,212,216,224,225,226,227,228,229,230,231,232,233];
+var id_conso = [3,4,15,26,36,38,40,41,42,43,44,45,46,61,63,96,97,113,131,153,154,159,
+               164,165,178,179,180,208,211,213,214,215,217,218,219,221,222];
+var id_resso = [5,6,12,13,35,65,66,67,68,69,70,71,72,73,89,90,94,112,132,,133,134,135,
+                142,143,144,145,171,172,173,174,175,176,187,209,210,220,223];
+var id_left = [37,88,139,158,169];
+
+if(localStorage.getItem("show_eq")==null) localStorage.setItem("show_eq",1);
+if(localStorage.getItem("show_co")==null) localStorage.setItem("show_co",1);
+if(localStorage.getItem("show_re")==null) localStorage.setItem("show_re",1);
 
 let top = document.getElementsByClassName("margin_position");
 mypos = parsePosition(top[0].innerText.trim());
@@ -66,11 +80,11 @@ if (page == "clan" && subp == "membres") {
     listNames = getNames();
     getPositions();
     localStorage.setItem("members",members);
-    sessionStorage.setItem("fetched",1);
+    localStorage.setItem("fetched",1);
 }
 
 if (page == 'vue') {
-    // if(sessionStorage.getItem("fetched")){
+    // if(localStorage.getItem("fetched")){
     //     members = localStorage.getItem("members");
     //     updateView(members);
 
@@ -114,12 +128,8 @@ function findMules() {
     for(var i=0;i<muleIcons.length;i++){
         let mule = muleIcons[0].parentNode.getElementsByClassName("profil_popin")[0].href.split("id=")[1].split("&")[0];
         mules.push(mule);
-        mules.push(mule);
     }
-    console.log(mules)
     localStorage.setItem("mules",mules);
-    let mules2 = localStorage.getItem("mules");
-    console.log(mules2)
 }
 
 function saveInventory(inv) {
@@ -135,25 +145,26 @@ function saveInventory(inv) {
         }
         table += "</tr>";
     }
-    sessionStorage.setItem(inv,table);
+    localStorage.setItem(inv,table);
 
 }
 
 function mergeInventory() {
 
     let i, table;
-    let mules = localStorage.getItem("mules");
+    let temp = localStorage.getItem("mules");
+    let mules = temp.split(',');
     console.log(mules);
 
     let inv_to_show = [];
-    if(sessionStorage.getItem("show_eq")==1) inv_to_show.push("Equipement");
-    if(sessionStorage.getItem("show_co")==1) inv_to_show.push("Consommable");
-    if(sessionStorage.getItem("show_re")==1) inv_to_show.push("Ressource");
+    if(localStorage.getItem("show_eq")==1) inv_to_show.push("Equipement");
+    if(localStorage.getItem("show_co")==1) inv_to_show.push("Consommable");
+    if(localStorage.getItem("show_re")==1) inv_to_show.push("Ressource");
     console.log(inv_to_show);
 
     let merged = '<table width="100%"><tbody>';
     for(i=0; i<inv_to_show.length; i++){
-        table = sessionStorage.getItem(inv_to_show[i]);
+        table = localStorage.getItem(inv_to_show[i]);
         if(table==null){
             merged += "Visitez d'abord la page " + inv_to_show[i] + " !<br>";
         }
@@ -162,7 +173,7 @@ function mergeInventory() {
         }
     }
     for(i=0; i<mules.length; i++){
-        table = sessionStorage.getItem(mules[i]);
+        table = localStorage.getItem(mules[i]);
         if(table==null){
             merged += "Visitez d'abord l'inventaire du mulet " + mules[i] + " !<br>";
         }
@@ -178,34 +189,34 @@ function mergeInventory() {
 function createInventory() {
      let state_eq, state_co, state_re;
     if(urlParams.get('Equipement')=='on') {
-        sessionStorage.setItem("show_eq",1);
+        localStorage.setItem("show_eq",1);
         state_eq = 'checked="checked"';
     }
     else{
-        sessionStorage.setItem("show_eq",0);
+        localStorage.setItem("show_eq",0);
         state_eq = '';
     }
     if(urlParams.get('Consommable')=='on') {
-        sessionStorage.setItem("show_co",1);
+        localStorage.setItem("show_co",1);
         state_co = 'checked="checked"';
     }
     else{
-        sessionStorage.setItem("show_co",0);
+        localStorage.setItem("show_co",0);
         state_co = '';
     }
     if(urlParams.get('Ressource')=='on') {
-        sessionStorage.setItem("show_re",1);
+        localStorage.setItem("show_re",1);
         state_re = 'checked="checked"';
     }
     else{
-        sessionStorage.setItem("show_re",0);
+        localStorage.setItem("show_re",0);
         state_re = '';
     }
 
     let bloc = document.getElementById("bloc");
     bloc.innerHTML = "\n<h3>Inventaire complet (sauf tenue)</h3>\n\n"
     + '<form id="form_inv" method="get" formaction="index.php?p=InventaireComplet">'
-    + '<input type="hidden" name="p"  value="' + page + '" />'
+    + '<input type="hidden" name="p"  value="' + page + '"/><strong>Catégories : </strong>&nbsp;&nbsp;'
     + '<input type="checkbox" name="Equipement" value="on" ' + state_eq + ' form="form_inv"/>&nbsp;Équipements &nbsp;&nbsp;'
     + '<input type="checkbox" name="Consommable" value="on" ' + state_co + ' form="form_inv"/>&nbsp;Consommables &nbsp;&nbsp;'
     + '<input type="checkbox" name="Ressource" value="on" ' + state_re + ' form="form_inv"/>&nbsp;Ressources &nbsp;&nbsp;'
@@ -249,9 +260,9 @@ function changeMenu() {
     submenus = menu.getElementsByClassName("parent");
 
     var url = '';
-    if(sessionStorage.getItem("show_eq")==1) url += '&Equipement=on';
-    if(sessionStorage.getItem("show_co")==1) url += '&Consommable=on';
-    if(sessionStorage.getItem("show_re")==1) url += '&Ressource=on';
+    if(localStorage.getItem("show_eq")==1) url += '&Equipement=on';
+    if(localStorage.getItem("show_co")==1) url += '&Consommable=on';
+    if(localStorage.getItem("show_re")==1) url += '&Ressource=on';
 
     for (i=0;i<submenus.length;i++){
         if(submenus[i].innerText == "Inventaire"){
