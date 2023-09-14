@@ -4,7 +4,7 @@
 // @contributor Ciol <ciolfire@gmail.com> (100% inspiré de Kigard Fashion Script)
 // @contributor
 // @description Un script facilitant la localisation des membres du clan
-// @version 0.5.2
+// @version 0.6
 // @grant GM_addStyle
 // @match https://tournoi.kigard.fr/*
 // @exclude 
@@ -37,33 +37,59 @@ const subp = urlParams.get('g');
 const inv = urlParams.get('genre');
 
 var id_equip = [1,2,7,8,9,10,11,14,16,17,18,19,20,21,22,23,24,25,27,28,29,30,31,32,33,
-               34,39,47,48,49,50,51,52,53,54,55,56,57,58,59,60,62,64,74,75,76,77,78,
-               79,80,81,82,83,84,85,86,87,91,92,93,95,98,99,100,101,102,103,104,105,
-               106,107,108,109,110,111,114,115,116,117,118,119,120,121,122,123,124,
-               125,126,127,128,129,130,136,137,138,140,141,146,147,148,149,150,151,
-               152,155,156,157,160,161,162,163,166,167,168,170,177,181,182,183,184,
-               185,186,188,189,190,191,192,193,194,195,196,197,198,199,200,201,202,
-               203,204,205,206,207,212,216,224,225,226,227,228,229,230,231,232,233];
+               34,39,47,48,49,51,52,53,54,55,56,57,58,59,60,62,64,74,75,76,77,78,
+               79,80,81,82,83,84,85,86,87,91,92,93,95,98,100,101,102,103,104,105,
+               106,107,108,109,110,111,114,115,116,117,118,119,121,122,123,124,
+               125,126,127,129,136,137,138,140,141,146,147,148,149,150,151,
+               152,155,156,157,160,161,162,163,166,167,168,177,181,182,183,184,
+               185,186,188,189,190,191,192,193,194,195,196,197,198,199,200,
+               203,204,205,206,207,212,216,224,225,226,227,228,229,230,231,232,233,
+               236,237,239,241,242,243,244,245,246,249,250,252,256,257,260,261,267,
+               268,269,270,271,275,276,284,285,286,287,289,290,291,292,294,296,297,
+               306,307,308,309,311,312,313,316,317,318,319,326,327,328,329,331,333,
+               334,335,336,337,344,350];
+
 var id_conso = [3,4,15,26,36,38,40,41,42,43,44,45,46,61,63,96,97,113,131,153,154,159,
-               164,165,178,179,180,208,211,213,214,215,217,218,219,221,222];
-var id_resso = [5,6,12,13,35,65,66,67,68,69,70,71,72,73,89,90,94,112,132,,133,134,135,
-                142,143,144,145,171,172,173,174,175,176,187,209,210,220,223];
-var id_left = [37,88,139,158,169];
+               164,165,178,179,180,208,211,213,214,215,217,218,219,221,222,253,258,259,
+               272,273,277,278,279,280,281,282,303,304,305,330,339,340];
+
+var id_resso = [5,6,12,13,35,65,66,67,68,69,70,71,72,73,89,90,112,
+                142,143,144,145,171,172,173,174,175,176,187,209,210,220,223,254,255,262,
+                274,283,293,295,298,299,300,301,302,310,314,315,338,341,342,343];
+
+
+var id_left = [37,50,88,94,99,120,128,130,132,133,134,135,139,158,169,170,201,202,
+              234,235,238,240,247,248,251,263,264,265,266,288,320,321,322,323,324,
+              325,332,345,346,347,348,349,351,352,353,354,355,356,357,358,359,360,
+              361,362,363,364,365,366,367,368,369,370];
 
 if(localStorage.getItem("show_eq")==null) localStorage.setItem("show_eq",1);
 if(localStorage.getItem("show_co")==null) localStorage.setItem("show_co",1);
 if(localStorage.getItem("show_re")==null) localStorage.setItem("show_re",1);
+
 
 let top = document.getElementsByClassName("margin_position");
 mypos = parsePosition(top[0].innerText.trim());
 let name = document.getElementsByTagName("strong");
 myname = name[0].innerText.trim();
 
-
+if (page == "options") {
+    if (urlParams.get('sm') == "portrait") {
+        let bloc = document.getElementById("bloc");
+        for(var i=0;i<id_left.length;i++) {
+            bloc.innerHTML += '<img src="https://tournoi.kigard.fr/images/items/' + id_left[i] + '.gif" class="transparent" width="72">';
+        }
+    }
+}
 
 if (page == "empathie") {
     findMules();
     addButtonEmpathie();
+}
+
+if(page == "formules") {
+    modifyFormulas();
+
 }
 
 if (page == "inventaire" && (inv == "Equipement" || inv == "Consommable" || inv == "Ressource")) {
@@ -101,6 +127,86 @@ if (page == "arene") {
     orderArenas();
 }
 
+
+function updateFilters() {
+
+    var filter, smalls, cat;
+    let radioButtons = document.getElementsByName("formulaFilter");
+    for(var i=0;i<radioButtons.length;i++) {
+        if(radioButtons[i].checked) {
+            localStorage.setItem("filter"+(i+1),"checked");
+            filter = radioButtons[i].labels[0].innerText.trim();
+        }
+        else localStorage.setItem("filter"+(i+1),"");
+    }
+
+    console.log(filter)
+
+    let table = document.getElementsByTagName("tbody")[0];
+    let lines = table.getElementsByTagName("tr");
+
+    for(i=0;i<lines.length;i++) {
+        smalls = lines[i].getElementsByTagName("small");
+        if(filter=="Tous"){
+            lines[i].removeAttribute('hidden');
+        }
+        else if(filter=="Autres") {
+            if(smalls.length==0) lines[i].removeAttribute('hidden');
+            else lines[i].setAttribute('hidden',true);
+        }
+        else {
+            if(smalls.length>0) {
+                cat = smalls[smalls.length-1].getElementsByTagName("i");
+                if(cat[0].innerText.split('-')[1].trim() == filter) lines[i].removeAttribute('hidden');
+                else lines[i].setAttribute('hidden',true);
+            }
+            else lines[i].setAttribute('hidden',true);
+        }
+    }
+}
+
+
+function modifyFormulas() {
+
+    localStorage.setItem("filter1","checked");
+    localStorage.setItem("filter2","");
+    localStorage.setItem("filter3","");
+    localStorage.setItem("filter4","");
+    localStorage.setItem("filter5","");
+    localStorage.setItem("filter6","");
+    localStorage.setItem("filter7","");
+    localStorage.setItem("filter8","");
+
+
+    let filter = document.getElementsByTagName("blockquote")[0];
+    // filter.innerHTML += '<form id="form_formules" method="get" formaction="index.php?p=formules">';
+    // filter.innerHTML += '<input type="hidden" name="p" value="formules"/>';
+    filter.innerHTML += '<div>';
+    filter.innerHTML += '<label><input type="radio" id="filter1" name="formulaFilter" ' + localStorage.getItem("filter1") + ' value="tous" />&nbsp;Tous</label>&nbsp;&nbsp;&nbsp;';
+    filter.innerHTML += '<label><input type="radio" id="filter2" name="formulaFilter" ' + localStorage.getItem("filter2") + ' value="tete" />&nbsp;Tête</label>&nbsp;&nbsp;&nbsp;';
+    filter.innerHTML += '<label><input type="radio" id="filter3" name="formulaFilter" ' + localStorage.getItem("filter3") + ' value="buste" />&nbsp;Buste</label>&nbsp;&nbsp;&nbsp;';
+    filter.innerHTML += '<label><input type="radio" id="filter4" name="formulaFilter" ' + localStorage.getItem("filter4") + ' value="maind" />&nbsp;Main droite</label>&nbsp;&nbsp;&nbsp;';
+    filter.innerHTML += '<label><input type="radio" id="filter5" name="formulaFilter" ' + localStorage.getItem("filter5") + ' value="maing" />&nbsp;Main gauche</label>&nbsp;&nbsp;&nbsp;';
+    filter.innerHTML += '<label><input type="radio" id="filter6" name="formulaFilter" ' + localStorage.getItem("filter6") + ' value="pieds" />&nbsp;Pieds</label>&nbsp;&nbsp;&nbsp;';
+    filter.innerHTML += '<label><input type="radio" id="filter7" name="formulaFilter" ' + localStorage.getItem("filter7") + ' value="fetiche" />&nbsp;Fétiche</label>&nbsp;&nbsp;&nbsp;';
+    filter.innerHTML += '<label><input type="radio" id="filter8" name="formulaFilter" ' + localStorage.getItem("filter8") + ' value="autres" />&nbsp;Autres</label>&nbsp;&nbsp;&nbsp;';
+    filter.innerHTML += '</div>';
+    // filter.innerHTML += '</form>';
+
+
+    let radioButtons = document.getElementsByName("formulaFilter");
+    console.log(radioButtons);
+    for(var i=0;i<radioButtons.length;i++) {
+        radioButtons[i].addEventListener("click", updateFilters);
+        // console.log(radioButtons[i]);
+    }
+
+}
+
+
+
+
+
 function orderArenas() {
     var name, arenas, title, x, y, i, arenapos, temp;
     arenas = document.getElementsByClassName("ddTitleText");
@@ -120,16 +226,22 @@ function updateView(members) {
 
 
 function findMules() {
-    let mules = [];
+    let mules_id = [];
+    let mules_name = [];
     let form = document.getElementsByTagName("form");
     if(form.length==0) return;
     form = form[form.length-1];
     let muleIcons = document.querySelectorAll('[title="Mulet"]');
     for(var i=0;i<muleIcons.length;i++){
-        let mule = muleIcons[0].parentNode.getElementsByClassName("profil_popin")[0].href.split("id=")[1].split("&")[0];
-        mules.push(mule);
+        let id = muleIcons[i].parentNode.getElementsByClassName("profil_popin")[0].href.split("id=")[1].split("&")[0];
+        let name = muleIcons[i].parentNode.getElementsByTagName("a")[0].innerText.trim();
+        mules_id.push(id)
+        mules_name.push(name);
     }
-    localStorage.setItem("mules",mules);
+    localStorage.setItem("mules_name",mules_name);
+    localStorage.setItem("mules_id",mules_id);
+    if(localStorage.getItem("show_mules")==null) localStorage.setItem("show_mules",mules_id);
+
 }
 
 function saveInventory(inv) {
@@ -146,21 +258,30 @@ function saveInventory(inv) {
         table += "</tr>";
     }
     localStorage.setItem(inv,table);
-
+    let ts = (new Date()).getTime();
+    localStorage.setItem(inv+'_ts',ts);
+    // console.log(ts);
 }
 
 function mergeInventory() {
 
-    let i, table;
-    let temp = localStorage.getItem("mules");
-    let mules = temp.split(',');
-    console.log(mules);
+    let i, table, temp;
+    temp = localStorage.getItem("mules_id");
+    let mules_id = temp.split(',');
+    temp = localStorage.getItem("mules_name");
+    let mules_name = temp.split(',');
+    temp = localStorage.getItem("show_mules");
+    let mules_to_show = [];
+    if(temp) mules_to_show = temp.split(',');
 
     let inv_to_show = [];
     if(localStorage.getItem("show_eq")==1) inv_to_show.push("Equipement");
     if(localStorage.getItem("show_co")==1) inv_to_show.push("Consommable");
     if(localStorage.getItem("show_re")==1) inv_to_show.push("Ressource");
-    console.log(inv_to_show);
+    // console.log(inv_to_show);
+    // let mule_to_show = [];
+    // if(localStorage.getItem("show_eq")==1) mule_to_show.push("Equipement");
+    // if(localStorage.getItem("show_co")==1) mule_to_show.push("Consommable");
 
     let merged = '<table width="100%"><tbody>';
     for(i=0; i<inv_to_show.length; i++){
@@ -172,10 +293,13 @@ function mergeInventory() {
             merged += table;
         }
     }
-    for(i=0; i<mules.length; i++){
-        table = localStorage.getItem(mules[i]);
+    for(i=0; i<mules_to_show.length; i++){
+        table = localStorage.getItem(mules_to_show[i]);
+        let mule;
         if(table==null){
-            merged += "Visitez d'abord l'inventaire du mulet " + mules[i] + " !<br>";
+            if(mules_name[i]=="Mulet") mule=mules_id[i];
+            else mule=mules_name[i];
+            merged += "Visitez d'abord l'inventaire du mulet " + mule + " !<br>";
         }
         else {
             merged += table;
@@ -187,10 +311,22 @@ function mergeInventory() {
 }
 
 function createInventory() {
-     let state_eq, state_co, state_re;
+    let state_eq, state_co, state_re, show_mules;
+    let ts_eq, ts_co, ts_re, ts_mules;
+    let temp, i;
+
+    temp = localStorage.getItem("mules_id");
+    let mules_id = temp.split(',');
+    temp = localStorage.getItem("mules_name");
+    let mules_name = temp.split(',');
+
+    console.log(mules_id);
+    console.log(mules_name);
+
     if(urlParams.get('Equipement')=='on') {
         localStorage.setItem("show_eq",1);
         state_eq = 'checked="checked"';
+        ts_eq = (new Date()).getTime() - localStorage.getItem("Equipement_ts");
     }
     else{
         localStorage.setItem("show_eq",0);
@@ -199,6 +335,7 @@ function createInventory() {
     if(urlParams.get('Consommable')=='on') {
         localStorage.setItem("show_co",1);
         state_co = 'checked="checked"';
+        ts_co = (new Date()).getTime() - localStorage.getItem("Consommable_ts");
     }
     else{
         localStorage.setItem("show_co",0);
@@ -207,24 +344,66 @@ function createInventory() {
     if(urlParams.get('Ressource')=='on') {
         localStorage.setItem("show_re",1);
         state_re = 'checked="checked"';
+        ts_re = (new Date()).getTime() - localStorage.getItem("Ressource_ts");
     }
     else{
         localStorage.setItem("show_re",0);
         state_re = '';
     }
 
-    let bloc = document.getElementById("bloc");
-    bloc.innerHTML = "\n<h3>Inventaire complet (sauf tenue)</h3>\n\n"
+    show_mules = [];
+    for(i=0;i<mules_id.length;i++) {
+        if(urlParams.get(mules_id[i])=='on') {
+            show_mules.push(mules_id[i]);
+        }
+    }
+
+    console.log(show_mules);
+    console.log(ts_mules);
+
+    localStorage.setItem("show_mules",show_mules);
+
+    let myhtml = "<h3>Inventaire complet (sauf tenue)</h3>"
     + '<form id="form_inv" method="get" formaction="index.php?p=InventaireComplet">'
-    + '<input type="hidden" name="p"  value="' + page + '"/><strong>Catégories : </strong>&nbsp;&nbsp;'
-    + '<input type="checkbox" name="Equipement" value="on" ' + state_eq + ' form="form_inv"/>&nbsp;Équipements &nbsp;&nbsp;'
-    + '<input type="checkbox" name="Consommable" value="on" ' + state_co + ' form="form_inv"/>&nbsp;Consommables &nbsp;&nbsp;'
-    + '<input type="checkbox" name="Ressource" value="on" ' + state_re + ' form="form_inv"/>&nbsp;Ressources &nbsp;&nbsp;'
-    + '<input name="refresh_inv" type="submit" value="Modifier" form="form_inv"></form>';
+    + '<table><tbody><tr><td><input type="hidden" name="p"  value="' + page + '"/><strong>Catégories : </strong>&nbsp;&nbsp;</td><td>'
+    + '<input type="checkbox" name="Equipement" value="on" ' + state_eq + ' form="form_inv"/>&nbsp;Équipements (' + formatTime(ts_eq) + ')&nbsp;&nbsp;'
+    + '<input type="checkbox" name="Consommable" value="on" ' + state_co + ' form="form_inv"/>&nbsp;Consommables (' + formatTime(ts_co) + ')&nbsp;&nbsp;'
+    + '<input type="checkbox" name="Ressource" value="on" ' + state_re + ' form="form_inv"/>&nbsp;Ressources (' + formatTime(ts_re) + ')&nbsp;&nbsp;</td></tr>';
+
+    if(mules_id.length>0){
+        myhtml += '<tr><td><strong>Mulets : </strong>&nbsp;&nbsp;</td><td>'
+        for(i=0; i<mules_id.length; i++) {
+            let name = mules_name[i];
+            let state_mule = '';
+            let ts = (new Date()).getTime() - localStorage.getItem(mules_id[i]+"_ts")
+            if(name=="Mulet") name=mules_id[i];
+            if(show_mules.includes(mules_id[i])) state_mule = 'checked="checked"';
+            myhtml += '<input type="checkbox" name="' + mules_id[i] + '" value="on" ' + state_mule + ' form="form_inv"/>&nbsp;' + name + ' (' + formatTime(ts) + ')&nbsp;&nbsp;';
+        }
+        myhtml += '</td></tr>';
+    }
+    myhtml += '</tbody></table><input name="refresh_inv" type="submit" value="Modifier" form="form_inv"></form>';
 
     // console.log(bloc);
     let table = mergeInventory();
-    bloc.innerHTML += table;
+    myhtml += table;
+
+    let bloc = document.getElementById("bloc");
+    bloc.innerHTML = myhtml;
+}
+
+function formatTime(time) {
+    if(typeof(time)!="number") return -1;
+    time /= 1000; // time in sec
+    let list_divid = [60,60,24];
+    let list_units = ['s','m','h','j'];
+    var i = 0;
+    while(1){
+        if(time/list_divid[i]<1) break;
+        time = time/list_divid[i];
+        i += 1;
+    }
+    return ""+Math.floor(time)+list_units[i];
 }
 
 
@@ -258,16 +437,26 @@ function changeMenu() {
     var i, menu, submenus, list, temp;
     menu = document.getElementById("menu");
     submenus = menu.getElementsByClassName("parent");
+    temp = localStorage.getItem("show_mules");
+    let mules_to_show = [];
+    if(temp) mules_to_show = temp.split(',');
 
-    var url = '';
-    if(localStorage.getItem("show_eq")==1) url += '&Equipement=on';
-    if(localStorage.getItem("show_co")==1) url += '&Consommable=on';
-    if(localStorage.getItem("show_re")==1) url += '&Ressource=on';
+    var urlTout = '';
+    if(localStorage.getItem("show_eq")==1) urlTout += '&Equipement=on';
+    if(localStorage.getItem("show_co")==1) urlTout += '&Consommable=on';
+    if(localStorage.getItem("show_re")==1) urlTout += '&Ressource=on';
+    for(i=0;i<mules_to_show.length;i++) {
+        urlTout += '&' + mules_to_show[i] + '=on';
+    }
+
+    // urlMules = [];
+    // for (i=0;i<localStorage.getItem("mules").length;i++){
+    //     urlMules
 
     for (i=0;i<submenus.length;i++){
         if(submenus[i].innerText == "Inventaire"){
             list = submenus[i].parentNode.getElementsByTagName("ul");
-            temp = list[0].innerHTML.slice(0,-5) + '<li><a href="index.php?p=InventaireComplet' + url + '">Tout</a></li>' + list[0].innerHTML.slice(-5);
+            temp = list[0].innerHTML.slice(0,-5) + '<li><a href="index.php?p=InventaireComplet' + urlTout + '">Tout</a></li>' + list[0].innerHTML.slice(-5);
             list[0].innerHTML = temp
             // console.log(list[0]);
         }
