@@ -4,7 +4,7 @@
 // @contributor Ciol <ciolfire@gmail.com> (100% inspiré de Kigard Fashion Script)
 // @contributor
 // @description Un script facilitant la localisation des membres du clan
-// @version 0.6
+// @version 0.6.1
 // @grant GM_addStyle
 // @match https://tournoi.kigard.fr/*
 // @exclude 
@@ -434,12 +434,18 @@ function addButtonEmpathie() {
 
 function changeMenu() {
 
-    var i, menu, submenus, list, temp;
+    var i, j, menu, submenus, list, temp;
     menu = document.getElementById("menu");
     submenus = menu.getElementsByClassName("parent");
     temp = localStorage.getItem("show_mules");
     let mules_to_show = [];
     if(temp) mules_to_show = temp.split(',');
+    temp = localStorage.getItem("mules_id");
+    let mules_id = [];
+    if(temp) mules_id = temp.split(',');
+    temp = localStorage.getItem("mules_name");
+    let mules_name = [];
+    if(temp) mules_name = temp.split(',');
 
     var urlTout = '';
     if(localStorage.getItem("show_eq")==1) urlTout += '&Equipement=on';
@@ -456,7 +462,13 @@ function changeMenu() {
     for (i=0;i<submenus.length;i++){
         if(submenus[i].innerText == "Inventaire"){
             list = submenus[i].parentNode.getElementsByTagName("ul");
-            temp = list[0].innerHTML.slice(0,-5) + '<li><a href="index.php?p=InventaireComplet' + urlTout + '">Tout</a></li>' + list[0].innerHTML.slice(-5);
+            temp = list[0].innerHTML.slice(0,-5);
+            for(j=0;j<mules_id.length;j++) {
+                let name = mules_name[j];
+                if(name=="Mulet") name += " " + mules_id[j];
+                temp += '<li><a href="index.php?p=gestion_stock&id_monstre=' + mules_id[j] + '"><img src="images/vue/monstre/37.gif" alt="Mulet" title="Mulet" class="elements" vertical-align="middle">&nbsp;' + name + '</a></li>';
+            }
+            temp += '<li><a href="index.php?p=InventaireComplet' + urlTout + '">Tout</a></li>' + list[0].innerHTML.slice(-5);
             list[0].innerHTML = temp
             // console.log(list[0]);
         }
