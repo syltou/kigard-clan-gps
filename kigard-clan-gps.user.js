@@ -267,12 +267,13 @@ function mergeInventory() {
 
     let i, table, temp;
     temp = localStorage.getItem("mules_id");
-    let mules_id = temp.split(',');
+    let mules_id = temp ? temp.split(',') : [];
     temp = localStorage.getItem("mules_name");
-    let mules_name = temp.split(',');
+    let mules_name = temp ? temp.split(',') : [];
     temp = localStorage.getItem("show_mules");
-    let mules_to_show = [];
-    if(temp) mules_to_show = temp.split(',');
+    let mules_to_show = temp ? temp.split(',') : [];
+
+    console.log(mules_to_show);
 
     let inv_to_show = [];
     if(localStorage.getItem("show_eq")==1) inv_to_show.push("Equipement");
@@ -312,13 +313,12 @@ function mergeInventory() {
 
 function createInventory() {
     let state_eq, state_co, state_re, show_mules;
-    let ts_eq, ts_co, ts_re, ts_mules;
-    let temp, i;
+    let temp, i, t;
 
     temp = localStorage.getItem("mules_id");
-    let mules_id = temp.split(',');
+    let mules_id = temp ? temp.split(',') : [];
     temp = localStorage.getItem("mules_name");
-    let mules_name = temp.split(',');
+    let mules_name = temp ? temp.split(',') : [];
 
     console.log(mules_id);
     console.log(mules_name);
@@ -326,7 +326,6 @@ function createInventory() {
     if(urlParams.get('Equipement')=='on') {
         localStorage.setItem("show_eq",1);
         state_eq = 'checked="checked"';
-        ts_eq = (new Date()).getTime() - localStorage.getItem("Equipement_ts");
     }
     else{
         localStorage.setItem("show_eq",0);
@@ -335,7 +334,6 @@ function createInventory() {
     if(urlParams.get('Consommable')=='on') {
         localStorage.setItem("show_co",1);
         state_co = 'checked="checked"';
-        ts_co = (new Date()).getTime() - localStorage.getItem("Consommable_ts");
     }
     else{
         localStorage.setItem("show_co",0);
@@ -344,12 +342,15 @@ function createInventory() {
     if(urlParams.get('Ressource')=='on') {
         localStorage.setItem("show_re",1);
         state_re = 'checked="checked"';
-        ts_re = (new Date()).getTime() - localStorage.getItem("Ressource_ts");
     }
     else{
         localStorage.setItem("show_re",0);
         state_re = '';
     }
+
+    let ts_eq = (t=localStorage.getItem("Equipement_ts")) ? (new Date()).getTime() - t : null;
+    let ts_co = (t=localStorage.getItem("Consommable_ts")) ? (new Date()).getTime() - t : null;
+    let ts_re = (t=localStorage.getItem("Ressource_ts")) ? (new Date()).getTime() - t : null;
 
     show_mules = [];
     for(i=0;i<mules_id.length;i++) {
@@ -357,10 +358,6 @@ function createInventory() {
             show_mules.push(mules_id[i]);
         }
     }
-
-    console.log(show_mules);
-    console.log(ts_mules);
-
     localStorage.setItem("show_mules",show_mules);
 
     let myhtml = "<h3>Inventaire complet (sauf tenue)</h3>"
@@ -375,7 +372,10 @@ function createInventory() {
         for(i=0; i<mules_id.length; i++) {
             let name = mules_name[i];
             let state_mule = '';
-            let ts = (new Date()).getTime() - localStorage.getItem(mules_id[i]+"_ts")
+            let mule_ts = localStorage.getItem(mules_id[i]+"_ts");
+            let ts = null;
+            if(mule_ts) ts = (new Date()).getTime() - mule_ts;
+            console.log(ts);
             if(name=="Mulet") name=mules_id[i];
             if(show_mules.includes(mules_id[i])) state_mule = 'checked="checked"';
             myhtml += '<input type="checkbox" name="' + mules_id[i] + '" value="on" ' + state_mule + ' form="form_inv"/>&nbsp;' + name + ' (' + formatTime(ts) + ')&nbsp;&nbsp;';
@@ -384,7 +384,7 @@ function createInventory() {
     }
     myhtml += '</tbody></table><input name="refresh_inv" type="submit" value="Modifier" form="form_inv"></form>';
 
-    // console.log(bloc);
+    console.log('toto');
     let table = mergeInventory();
     myhtml += table;
 
