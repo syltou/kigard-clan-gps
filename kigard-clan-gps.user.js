@@ -4,7 +4,7 @@
 // @contributor Ciol <ciolfire@gmail.com> (100% inspiré de Kigard Fashion Script)
 // @contributor
 // @description Un script facilitant la localisation des membres du clan
-// @version 0.6.1
+// @version 0.7
 // @grant GM_addStyle
 // @match https://tournoi.kigard.fr/*
 // @exclude 
@@ -94,11 +94,15 @@ if(page == "formules") {
 
 if (page == "inventaire" && (inv == "Equipement" || inv == "Consommable" || inv == "Ressource")) {
     saveInventory(inv);
+    let bloc = document.getElementById("bloc");
+    addCopyButton(bloc.getElementsByTagName("table")[0]);
 }
 
 if (page == "gestion_stock") {
     let mule = urlParams.get('id_monstre');
     saveInventory(mule);
+    let bloc = document.getElementById("bloc");
+    addCopyButton(bloc.getElementsByTagName("table")[0]);
 }
 
 
@@ -195,10 +199,7 @@ function modifyFormulas() {
 
 
     let radioButtons = document.getElementsByName("formulaFilter");
-    console.log(radioButtons);
     for(var i=0;i<radioButtons.length;i++) {
-        radioButtons[i].addEventListener("click", updateFilters);
-        // console.log(radioButtons[i]);
     }
 
 }
@@ -250,12 +251,12 @@ function saveInventory(inv) {
     // console.log(lines.length)
     table = "";
     for (i=0;i<lines.length;i++){
-        table += "<tr>";
         if(lines[i].parentNode.tagName == "TD") {
+            table += "<tr>";
             cell = lines[i].parentNode.outerHTML;
             table += cell;
+            table += "</tr>";
         }
-        table += "</tr>";
     }
     localStorage.setItem(inv,table);
     let ts = (new Date()).getTime();
@@ -284,7 +285,7 @@ function mergeInventory() {
     // if(localStorage.getItem("show_eq")==1) mule_to_show.push("Equipement");
     // if(localStorage.getItem("show_co")==1) mule_to_show.push("Consommable");
 
-    let merged = '<table width="100%"><tbody>';
+    let merged = '<table id="inventaire_complet" width="100%"><tbody>';
     for(i=0; i<inv_to_show.length; i++){
         table = localStorage.getItem(inv_to_show[i]);
         if(table==null){
@@ -382,15 +383,58 @@ function createInventory() {
         }
         myhtml += '</td></tr>';
     }
-    myhtml += '</tbody></table><input name="refresh_inv" type="submit" value="Modifier" form="form_inv"></form>';
-
-    console.log('toto');
+    myhtml += '</tbody></table><input name="refresh_inv" type="submit" value="Modifier" form="form_inv"></form><br><br>';
     let table = mergeInventory();
     myhtml += table;
 
     let bloc = document.getElementById("bloc");
     bloc.innerHTML = myhtml;
+
+    addCopyButton(document.getElementById("inventaire_complet"));
+
 }
+
+
+function addCopyButton(table) {
+
+    let parent = table.parentNode;
+    // let button2 = '<input name="copy_list" type="button" value="Copier la liste">';
+    let button = document.createElement("input");//, { name: "copy_list"; type: "button"; value: "Copier la liste" });
+    button.name = "copy_list";
+    button.type = "button";
+    button.value = "Copier la liste";
+
+    parent.insertBefore(button,table);
+
+    let copy_button = document.getElementsByName("copy_list");
+    copy_button[0].addEventListener("click", copyList);
+}
+
+
+function copyList() {
+    let tbody = document.getElementsByTagName("tbody");
+    console.log(tbody);
+    let table = tbody[tbody.length-1];
+    console.log(table);
+    let trs = table.getElementsByTagName("tr");
+    console.log(trs);
+    let trs2 = [];
+
+    for(var i=0;i<trs.length;i++){
+        trs2.push(trs[i].innerHTML);
+        let name = trs[i].getElementsByTagName("strong")[0];
+        trs[i].innerHTML = name.innerText;
+    }
+    navigator.clipboard.writeText(table.innerText);
+
+    for(i=0;i<trs.length;i++){
+        trs[i].innerHTML = trs2[i];
+    }
+}
+
+
+
+
 
 function formatTime(time) {
     if(typeof(time)!="number") return -1;
