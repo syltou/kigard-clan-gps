@@ -4,7 +4,7 @@
 // @contributor Ciol <ciolfire@gmail.com> (100% inspiré de Kigard Fashion Script)
 // @contributor
 // @description Un script facilitant la localisation des membres du clan
-// @version 0.7
+// @version 0.7.5
 // @grant GM_addStyle
 // @match https://tournoi.kigard.fr/*
 // @exclude 
@@ -88,8 +88,8 @@ if (page == "empathie") {
 }
 
 if(page == "formules") {
-    modifyFormulas();
-
+    tagFormulas();
+    addFiltersToFormulas();
 }
 
 if (page == "inventaire" && (inv == "Equipement" || inv == "Consommable" || inv == "Ressource")) {
@@ -105,6 +105,10 @@ if (page == "gestion_stock") {
     addCopyButton(bloc.getElementsByTagName("table")[0]);
 }
 
+// DOES NOT WORK IN FIREFOX
+if (page == "messagerie" && subp == "nouveau_message") {
+    // addPasteButton(document.getElementById("new_message"));
+}
 
 if (page == "clan" && subp == "membres") {
     listNames = getNames();
@@ -132,7 +136,7 @@ if (page == "arene") {
 }
 
 
-function updateFilters() {
+function filterFormulas() {
 
     var filter, smalls, cat;
     let radioButtons = document.getElementsByName("formulaFilter");
@@ -170,7 +174,7 @@ function updateFilters() {
 }
 
 
-function modifyFormulas() {
+function addFiltersToFormulas() {
 
     localStorage.setItem("filter1","checked");
     localStorage.setItem("filter2","");
@@ -182,27 +186,125 @@ function modifyFormulas() {
     localStorage.setItem("filter8","");
 
 
-    let filter = document.getElementsByTagName("blockquote")[0];
-    // filter.innerHTML += '<form id="form_formules" method="get" formaction="index.php?p=formules">';
-    // filter.innerHTML += '<input type="hidden" name="p" value="formules"/>';
-    filter.innerHTML += '<div>';
-    filter.innerHTML += '<label><input type="radio" id="filter1" name="formulaFilter" ' + localStorage.getItem("filter1") + ' value="tous" />&nbsp;Tous</label>&nbsp;&nbsp;&nbsp;';
-    filter.innerHTML += '<label><input type="radio" id="filter2" name="formulaFilter" ' + localStorage.getItem("filter2") + ' value="tete" />&nbsp;Tête</label>&nbsp;&nbsp;&nbsp;';
-    filter.innerHTML += '<label><input type="radio" id="filter3" name="formulaFilter" ' + localStorage.getItem("filter3") + ' value="buste" />&nbsp;Buste</label>&nbsp;&nbsp;&nbsp;';
-    filter.innerHTML += '<label><input type="radio" id="filter4" name="formulaFilter" ' + localStorage.getItem("filter4") + ' value="maind" />&nbsp;Main droite</label>&nbsp;&nbsp;&nbsp;';
-    filter.innerHTML += '<label><input type="radio" id="filter5" name="formulaFilter" ' + localStorage.getItem("filter5") + ' value="maing" />&nbsp;Main gauche</label>&nbsp;&nbsp;&nbsp;';
-    filter.innerHTML += '<label><input type="radio" id="filter6" name="formulaFilter" ' + localStorage.getItem("filter6") + ' value="pieds" />&nbsp;Pieds</label>&nbsp;&nbsp;&nbsp;';
-    filter.innerHTML += '<label><input type="radio" id="filter7" name="formulaFilter" ' + localStorage.getItem("filter7") + ' value="fetiche" />&nbsp;Fétiche</label>&nbsp;&nbsp;&nbsp;';
-    filter.innerHTML += '<label><input type="radio" id="filter8" name="formulaFilter" ' + localStorage.getItem("filter8") + ' value="autres" />&nbsp;Autres</label>&nbsp;&nbsp;&nbsp;';
-    filter.innerHTML += '</div>';
-    // filter.innerHTML += '</form>';
+    // let filter = document.getElementsByTagName("blockquote")[0];
+    // // filter.innerHTML += '<form id="form_formules" method="get" formaction="index.php?p=formules">';
+    // // filter.innerHTML += '<input type="hidden" name="p" value="formules"/>';
+    // filter.innerHTML += '<div>';
+    // filter.innerHTML += '<label><input type="radio" id="filter1" name="formulaFilter" ' + localStorage.getItem("filter1") + ' value="tous" />&nbsp;Tous</label>&nbsp;&nbsp;&nbsp;';
+    // filter.innerHTML += '<label><input type="radio" id="filter2" name="formulaFilter" ' + localStorage.getItem("filter2") + ' value="tete" />&nbsp;Tête</label>&nbsp;&nbsp;&nbsp;';
+    // filter.innerHTML += '<label><input type="radio" id="filter3" name="formulaFilter" ' + localStorage.getItem("filter3") + ' value="buste" />&nbsp;Buste</label>&nbsp;&nbsp;&nbsp;';
+    // filter.innerHTML += '<label><input type="radio" id="filter4" name="formulaFilter" ' + localStorage.getItem("filter4") + ' value="maind" />&nbsp;Main droite</label>&nbsp;&nbsp;&nbsp;';
+    // filter.innerHTML += '<label><input type="radio" id="filter5" name="formulaFilter" ' + localStorage.getItem("filter5") + ' value="maing" />&nbsp;Main gauche</label>&nbsp;&nbsp;&nbsp;';
+    // filter.innerHTML += '<label><input type="radio" id="filter6" name="formulaFilter" ' + localStorage.getItem("filter6") + ' value="pieds" />&nbsp;Pieds</label>&nbsp;&nbsp;&nbsp;';
+    // filter.innerHTML += '<label><input type="radio" id="filter7" name="formulaFilter" ' + localStorage.getItem("filter7") + ' value="fetiche" />&nbsp;Fétiche</label>&nbsp;&nbsp;&nbsp;';
+    // filter.innerHTML += '<label><input type="radio" id="filter8" name="formulaFilter" ' + localStorage.getItem("filter8") + ' value="autres" />&nbsp;Autres</label>&nbsp;&nbsp;&nbsp;';
+    // filter.innerHTML += '</div>';
+    // // filter.innerHTML += '</form>';
+
+    //     let radioButtons = document.getElementsByName("formulaFilter");
+//     for(var i=0;i<radioButtons.length;i++) {
+//         radioButtons[i].addEventListener("click", filterFormulas);
+//     }
 
 
-    let radioButtons = document.getElementsByName("formulaFilter");
-    for(var i=0;i<radioButtons.length;i++) {
-    }
+    let bloc = document.getElementById("bloc");
+    let table = bloc.getElementsByTagName("table")[0];
+
+    let extra = document.createElement("div");
+    extra.setAttribute('class',"filtres");
+    extra.setAttribute('style',"text-align:center;");
+
+    extra.innerHTML = '<blockquote class="bloc"><strong>Types d\'objet</strong><br><a href="#" data-equip="Tous">Tous</a> '
+        + '<span><img src="images/interface/puce_small.gif" alt=""> <img src="images/items/7.gif" class="item"><a href="#" data-equip="tete">Tête</a> </span> '
+        + '<span><img src="images/interface/puce_small.gif" alt=""> <img src="images/items/48.gif" class="item"><a href="#" data-equip="buste">Buste</a> </span> '
+        + '<span><img src="images/interface/puce_small.gif" alt=""> <img src="images/items/8.gif" class="item"><a href="#" data-equip="pieds">Pieds</a> </span> '
+        + '<span><img src="images/interface/puce_small.gif" alt=""> <img src="images/items/136.gif" class="item"><img src="images/items/76.gif" class="item"><a href="#" data-equip="main-droite">Main droite</a> </span> '
+        + '<span><img src="images/interface/puce_small.gif" alt=""> <img src="images/items/2.gif" class="item"><img src="images/items/24.gif" class="item"><a href="#" data-equip="main-gauche">Main gauche</a> </span>'
+        + '<span><img src="images/interface/puce_small.gif" alt=""> <img src="images/items/122.gif" class="item"><img src="images/items/17.gif" class="item"><a href="#" data-equip="deux-mains">Deux mains</a> </span>'
+        + '<span><img src="images/interface/puce_small.gif" alt=""> <a href="#" data-equip="autres">Autres</a> </span>'
+        + '</blockquote>';
+
+    bloc.insertBefore(extra,table);
+
+
+    $('a[data-equip]').click(newfilter);
 
 }
+
+function newfilter() {
+    $('a[data-equip]').removeAttr("class");
+    var formule = $('a[data-formule][class="sel"]').text();
+    var metier = $('a[data-metier][class="sel"]').text();
+    var equip = $(this).data('equip');
+
+    console.log(formule);
+    console.log(metier);
+    console.log(equip);
+
+    if (equip === 'Tous') {
+        $('tr[data-equip]').show();
+    } else {
+        $('tr[data-equip*=' + equip + ']').show();
+        $('tr:not([data-equip*=' + equip + '])').hide();
+    }
+    if (formule === 'Réalisables') {
+        $('tr:not([data-formule="Réalisables"])').hide();
+    }
+    if (metier !== 'Tous') {
+        $('tr:not([data-metier*=' + metier + '])').hide();
+    }
+    $('tr[data-metier=fixe]').show();
+    $(this).attr("class", "sel");
+}
+
+function tagFormulas() {
+    let table = document.getElementsByTagName("tbody")[0];
+    let smalls = table.getElementsByTagName("small");
+
+    for(var i=0;i<smalls.length;i++) {
+        if(smalls[i].parentNode.tagName != 'EM') {
+            let line = smalls[i].parentNode.parentNode;
+            let value = smalls[i].innerText.split('-')[1].trim();
+            switch(value) {
+                case 'Tête':
+                    line.setAttribute('data-equip','tete');
+                    break;
+                case 'Buste':
+                    line.setAttribute('data-equip','buste');
+                    break;
+                case 'Pieds':
+                    line.setAttribute('data-equip','pieds');
+                    break;
+                case 'Main droite':
+                    line.setAttribute('data-equip','main-droite');
+                    break;
+                case 'Main gauche':
+                    line.setAttribute('data-equip','main-gauche');
+                    break;
+                case 'Deux mains':
+                case 'Deux mains d\'arc':
+                case 'Deux mains de fusil':
+                    line.setAttribute('data-equip','deux-mains');
+                    break;
+                // case 'Contenant d\'arc':
+                // case 'Contenant de fusil':
+                //     line.setAttribute('data-equip','contenant');
+                //     break;
+                // case 'Fétiche':
+                //     line.setAttribute('data-equip','fetiche');
+                //     break;
+                default:
+                    line.setAttribute('data-equip','autres');
+            }
+        }
+    }
+
+    let trs = table.getElementsByTagName("tr");
+    for(i=1;i<trs.length;i++) {
+       if(trs[i].getAttribute('data-equip') == null) trs[i].setAttribute('data-equip','autres');
+    }
+}
+
 
 
 
@@ -411,6 +513,23 @@ function addCopyButton(table) {
 }
 
 
+// function addPasteButton(element) {
+
+//     let parent = element.parentNode;
+//     // let button2 = '<input name="copy_list" type="button" value="Copier la liste">';
+//     let button = document.createElement("input");//, { name: "copy_list"; type: "button"; value: "Copier la liste" });
+//     button.name = "paste_in_message";
+//     button.type = "button";
+//     button.value = "Coller";
+
+//     parent.insertBefore(button,element);
+
+//     let paste_button = document.getElementsByName("paste_in_message");
+//     paste_button[0].addEventListener("click", pasteInMessage);
+// }
+
+
+
 function copyList() {
     let tbody = document.getElementsByTagName("tbody");
     console.log(tbody);
@@ -433,16 +552,23 @@ function copyList() {
 }
 
 
+// does not work in firefox
+// function pasteInMessage() {
+//     let doc = document.getElementsByTagName('iframe')[0].contentWindow.document;
+//     doc.open();
+//     navigator.clipboard.readText().then((clipText) => (doc.write(clipText)));
+//     doc.close();
+// }
 
 
 
 function formatTime(time) {
     if(typeof(time)!="number") return -1;
     time /= 1000; // time in sec
-    let list_divid = [60,60,24];
-    let list_units = ['s','m','h','j'];
+    let list_divid = [60,60,24,7];
+    let list_units = ['s','m','h','d','w'];
     var i = 0;
-    while(1){
+    while(i<list_divid.length){
         if(time/list_divid[i]<1) break;
         time = time/list_divid[i];
         i += 1;
