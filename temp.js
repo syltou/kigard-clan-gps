@@ -7,7 +7,7 @@
 // @version 0.7.5
 // @grant GM_addStyle
 // @match https://tournoi.kigard.fr/*
-// @exclude 
+// @exclude
 // ==/UserScript==
 
 
@@ -150,7 +150,7 @@ function filterFormulas() {
         else localStorage.setItem("filter"+(i+1),"");
     }
 
-    console.log(filter)
+    // console.log(filter)
 
     let table = document.getElementsByTagName("tbody")[0];
     let lines = table.getElementsByTagName("tr");
@@ -232,16 +232,80 @@ function addFiltersToFormulas() {
         + '</blockquote>';
 
     bloc.insertBefore(extra,table);
-    $('a[data-equip]').click(filterCategory);
-    $('a[data-metier]').click(updateTableTitle);
-    $('a[data-metier]').click(updateComponentsFilter);
+
+    // $('a[data-equip]').click(filterCategory);
+    // $('a[data-metier]').click(filterMetier);
+    $('a[data-equip]').click(filterFormulas);
+    $('a[data-metier]').click(filterFormulas);
+    $('a[data-formule]').click(filterFormulas);
 
     updateComponentsFilter();
     updateTableTitle();
 
+    // set default filters
+    $('a[data-formule]')[0].setAttribute("class", "sel"); // formules Connues
+    $('a[data-metier]')[0].setAttribute("class", "sel"); // métiers Tous
+    $('a[data-equip]')[0].setAttribute("class", "sel"); // Equipe Tous
+
     addCopyButton(table,"formulas");
 
 }
+
+function filterFormula() {
+    $('a[data-metier]').removeAttr("class");
+    var formule = $('a[data-formule][class="sel"]').text();
+    var equip = $('a[data-equip][class="sel"]').text();
+    var metier = $(this).data('metier');
+
+    console.log(formule);
+    console.log(metier);
+    console.log(equip);
+
+    $('tr[data-metier]').show();
+    if (equip !== 'Tous') {
+        $('tr:not([data-equip*=' + equip + '])').hide();
+    }
+    if (formule === 'Réalisables') {
+        $('tr:not([data-formule="Réalisables"])').hide();
+    }
+    if (metier !== 'Tous') {
+        $('tr:not([data-metier*=' + metier + '])').hide();
+    }
+    $('tr[data-metier=fixe]').show();
+    $(this).attr("class", "sel");
+
+    updateComponentsFilter();
+    updateTableTitle()
+}
+
+
+function filterMetier() {
+    $('a[data-metier]').removeAttr("class");
+    var formule = $('a[data-formule][class="sel"]').text();
+    var equip = $('a[data-equip][class="sel"]').text();
+    var metier = $(this).data('metier');
+
+    console.log(formule);
+    console.log(metier);
+    console.log(equip);
+
+    $('tr[data-metier]').show();
+    if (equip !== 'Tous') {
+        $('tr:not([data-equip*=' + equip + '])').hide();
+    }
+    if (formule === 'Réalisables') {
+        $('tr:not([data-formule="Réalisables"])').hide();
+    }
+    if (metier !== 'Tous') {
+        $('tr:not([data-metier*=' + metier + '])').hide();
+    }
+    $('tr[data-metier=fixe]').show();
+    $(this).attr("class", "sel");
+
+    updateComponentsFilter();
+    updateTableTitle()
+}
+
 
 function filterCategory() {
     $('a[data-equip]').removeAttr("class");
@@ -253,10 +317,8 @@ function filterCategory() {
     // console.log(metier);
     // console.log(equip);
 
-    if (equip === 'Tous') {
-        $('tr[data-equip]').show();
-    } else {
-        $('tr[data-equip*=' + equip + ']').show();
+    $('tr[data-metier]').show();
+    if (equip !== 'Tous') {
         $('tr:not([data-equip*=' + equip + '])').hide();
     }
     if (formule === 'Réalisables') {
@@ -315,17 +377,25 @@ function filterComponents() {
     var equip = $('a[data-equip][class="sel"]').text();
     var comp = $(this).data('comp');
 
-    console.log(formule);
-    console.log(metier);
-    console.log(equip);
-    console.log(comp);
+    // console.log(formule);
+    // console.log(metier);
+    // console.log(equip);
+    // console.log(comp);
 
+
+    // Working try
     let lines = $("tr[data-formule]").not("[style='display: none;']");
     let comps = lines.find("td:last");
     lines.hide();
+    $("tr[data-formule]").not("[style='display: none;']").find("td:last-child").find("img[src*='5.gif']").parent().parent().hide()
     for(var j=0;j<comps.length;j++) {
         if(comps[j].innerHTML.includes(comp+".gif")) lines[j].setAttribute("style","display: table-row;");
     }
+
+
+    // //New try
+    // $("tr[data-formule]").not("[style='display: none;']").find("td:last-child").not(":has([src*='5.gif'])").parent().parent().hide();
+
 
 
 //     if (equip === 'Tous') {
@@ -406,7 +476,7 @@ function updateTableTitle() {
 function countComponents() {
     ingredients = [];
     let imgs = $("tr[data-formule]").not('[style="display: none;"]').children("td:last-child").children("img");
-        console.log(imgs);
+
     for(var j=0;j<imgs.length;j++) {
         let ingr = imgs[j].src.split("/items/")[1];
         if(!(ingredients.includes(ingr))) ingredients.push(ingr);
@@ -481,7 +551,7 @@ function mergeInventory() {
     temp = localStorage.getItem("show_mules");
     let mules_to_show = temp ? temp.split(',') : [];
 
-    console.log(mules_to_show);
+    // console.log(mules_to_show);
 
     let inv_to_show = [];
     if(localStorage.getItem("show_eq")==1) inv_to_show.push("Equipement");
@@ -528,8 +598,8 @@ function createInventory() {
     temp = localStorage.getItem("mules_name");
     let mules_name = temp ? temp.split(',') : [];
 
-    console.log(mules_id);
-    console.log(mules_name);
+    // console.log(mules_id);
+    // console.log(mules_name);
 
     if(urlParams.get('Equipement')=='on') {
         localStorage.setItem("show_eq",1);
@@ -583,7 +653,7 @@ function createInventory() {
             let mule_ts = localStorage.getItem(mules_id[i]+"_ts");
             let ts = null;
             if(mule_ts) ts = (new Date()).getTime() - mule_ts;
-            console.log(ts);
+            // console.log(ts);
             if(name=="Mulet") name=mules_id[i];
             if(show_mules.includes(mules_id[i])) state_mule = 'checked="checked"';
             myhtml += '<input type="checkbox" name="' + mules_id[i] + '" value="on" ' + state_mule + ' form="form_inv"/>&nbsp;' + name + ' (' + formatTime(ts) + ')&nbsp;&nbsp;';
@@ -837,5 +907,3 @@ function direction(angle,short=0){
         else return "au Sud-Est";
     }
 }
-
-
