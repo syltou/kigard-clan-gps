@@ -320,6 +320,8 @@ function filterMetier() {
     $('a[data-metier]').removeAttr("class");
     var formule = $('a[data-formule][class="sel"]').text();
     var metier = $(this).data('metier');
+	var cat = $('a[data-category][class="sel"]').text();
+
     if (metier === 'Tous') {
         $('tr[data-metier]').show();
     } else {
@@ -339,15 +341,15 @@ function filterCategory() {
     $('a[data-category]').removeAttr("class");
     var formule = $('a[data-formule][class="sel"]').text();
     var metier = $('a[data-metier][class="sel"]').text();
-    var equip = $(this).data('equip');
+    var cat = $(this).data('category');
 
     // console.log(formule);
     // console.log(metier);
-    // console.log(equip);
+    // console.log(cat);
 
     $('tr[data-metier]').show();
-    if (equip !== 'Tous') {
-        $('tr:not([data-category*=' + equip + '])').hide();
+    if (cat !== 'Tous') {
+        $('tr:not([data-category*=' + cat + '])').hide();
     }
     if (formule === 'Réalisables') {
         $('tr:not([data-formule="Réalisables"])').hide();
