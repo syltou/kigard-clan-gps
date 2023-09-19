@@ -90,8 +90,8 @@ if (page == "empathie") {
 
 if(page == "formules") {
 
-    tagFormulas();
-    addFiltersToFormulas();
+
+    modifyFormulasPage();
 }
 
 if (page == "inventaire" && (inv == "Equipement" || inv == "Consommable" || inv == "Ressource")) {
@@ -176,16 +176,16 @@ function filterFormulas() {
 }
 
 
-function addFiltersToFormulas() {
+function modifyFormulasPage() {
 
-    localStorage.setItem("filter1","checked");
-    localStorage.setItem("filter2","");
-    localStorage.setItem("filter3","");
-    localStorage.setItem("filter4","");
-    localStorage.setItem("filter5","");
-    localStorage.setItem("filter6","");
-    localStorage.setItem("filter7","");
-    localStorage.setItem("filter8","");
+    // localStorage.setItem("filter1","checked");
+    // localStorage.setItem("filter2","");
+    // localStorage.setItem("filter3","");
+    // localStorage.setItem("filter4","");
+    // localStorage.setItem("filter5","");
+    // localStorage.setItem("filter6","");
+    // localStorage.setItem("filter7","");
+    // localStorage.setItem("filter8","");
 
 
     // let filter = document.getElementsByTagName("blockquote")[0];
@@ -208,53 +208,43 @@ function addFiltersToFormulas() {
 //         radioButtons[i].addEventListener("click", filterFormulas);
 //     }
 
-
-    let bloc = document.getElementById("bloc");
-    let parts = bloc.innerHTML.split('<br><br>');
-
-    // bloc.innerHTML = parts[0] + '</blockquote></div><div class="filtres" style="text-align:center;"><blockquote class="bloc"><strong>Métiers</strong><br>' + parts[1];
+	updatePageAttributes();
+	updateOriginalFilters();
+	addCategoryFilters();
 
 
-    let table = bloc.getElementsByTagName("table")[0];
-
-    let extra = document.createElement("div");
-    extra.setAttribute('class',"filtres");
-    extra.setAttribute('style',"text-align:center;");
-
-    extra.innerHTML = '<blockquote id="type-objets" class="bloc"><strong>Types d\'objet</strong><br><a href="#" data-equip="Tous">Tous</a> '
-        + '<span><img src="images/interface/puce_small.gif" alt=""> <img src="images/items/7.gif" class="item"><a href="#" data-equip="tete">Tête</a> </span> '
-        + '<span><img src="images/interface/puce_small.gif" alt=""> <img src="images/items/48.gif" class="item"><a href="#" data-equip="buste">Buste</a> </span> '
-        + '<span><img src="images/interface/puce_small.gif" alt=""> <img src="images/items/8.gif" class="item"><a href="#" data-equip="pieds">Pieds</a> </span> '
-        + '<span><img src="images/interface/puce_small.gif" alt=""> <img src="images/items/136.gif" class="item"><img src="images/items/76.gif" class="item"><a href="#" data-equip="main-droite">Main droite</a> </span> '
-        + '<span><img src="images/interface/puce_small.gif" alt=""> <img src="images/items/2.gif" class="item"><img src="images/items/24.gif" class="item"><a href="#" data-equip="main-gauche">Main gauche</a> </span>'
-        + '<span><img src="images/interface/puce_small.gif" alt=""> <img src="images/items/122.gif" class="item"><img src="images/items/17.gif" class="item"><a href="#" data-equip="deux-mains">Deux mains</a> </span>'
-        + '<span><img src="images/interface/puce_small.gif" alt=""> <a href="#" data-equip="autres">Autres</a> </span>'
-        + '</blockquote>';
-
-    bloc.insertBefore(extra,table);
-
-    // $('a[data-equip]').click(filterCategory);
-    // $('a[data-metier]').click(filterMetier);
-    $('a[data-equip]').click(filterFormulas);
-    $('a[data-metier]').click(filterFormulas);
-    $('a[data-formule]').click(filterFormulas);
-
-    updateComponentsFilter();
+    // updateComponentsFilter();
     updateTableTitle();
 
-    // set default filters
-    $('a[data-formule]')[0].setAttribute("class", "sel"); // formules Connues
-    $('a[data-metier]')[0].setAttribute("class", "sel"); // métiers Tous
-    $('a[data-equip]')[0].setAttribute("class", "sel"); // Equipe Tous
-
-    addCopyButton(table,"formulas");
+	addCopyButton($('#formulas-table')[0],"formulas");
 
 }
 
-function filterFormula() {
+
+function updateOriginalFilters() {
+
+	// remove existing event for formule filters
+	$("a[data-formule]").off("click");
+	// add a new one
+	$("a[data-formule]").click(filterFormule);
+    // set default filters
+    $('a[data-formule="Connues"]').attr("class", "sel"); // formules Connues
+
+
+	// remove existing event for metier filters
+	$("a[data-metier]").off("click");
+	// add a new one
+	$("a[data-metier]").click(filterMetier);
+    // set default filters
+    $('a[data-metier="Tous"]').attr("class", "sel"); // métiers Tous
+
+}
+
+
+function myfilterFormula() {
     $('a[data-metier]').removeAttr("class");
     var formule = $('a[data-formule][class="sel"]').text();
-    var equip = $('a[data-equip][class="sel"]').text();
+    var equip = $('a[data-category][class="sel"]').text();
     var metier = $(this).data('metier');
 
     console.log(formule);
@@ -263,7 +253,7 @@ function filterFormula() {
 
     $('tr[data-metier]').show();
     if (equip !== 'Tous') {
-        $('tr:not([data-equip*=' + equip + '])').hide();
+        $('tr:not([data-category*=' + equip + '])').hide();
     }
     if (formule === 'Réalisables') {
         $('tr:not([data-formule="Réalisables"])').hide();
@@ -278,37 +268,75 @@ function filterFormula() {
     updateTableTitle()
 }
 
+
+function myfilterMetier() {
+    $('a[data-metier]').removeAttr("class");
+    var formule = $('a[data-formule][class="sel"]').text();
+    var equip = $('a[data-category][class="sel"]').text();
+    var metier = $(this).data('metier');
+
+    console.log(formule);
+    console.log(metier);
+    console.log(equip);
+
+    $('tr[data-metier]').show();
+    if (equip !== 'Tous') {
+        $('tr:not([data-category*=' + equip + '])').hide();
+    }
+    if (formule === 'Réalisables') {
+        $('tr:not([data-formule="Réalisables"])').hide();
+    }
+    if (metier !== 'Tous') {
+        $('tr:not([data-metier*=' + metier + '])').hide();
+    }
+    $('tr[data-metier=fixe]').show();
+    $(this).attr("class", "sel");
+
+    updateComponentsFilter();
+    updateTableTitle()
+}
+
+
+function filterFormule() {
+    $('a[data-formule]').removeAttr("class");
+    var formule = $(this).data('formule');
+    var metier = $('a[data-metier][class="sel"]').text();
+    if (formule === 'Connues') {
+        $('tr[data-formule]').show();
+    } else {
+        $('tr[data-metier*=' + metier + ']').show();
+        $('tr:not([data-formule="Réalisables"])').hide();
+    }
+    if (metier !== 'Tous') {
+        $('tr:not([data-metier*=' + metier + '])').hide();
+    }
+    $('tr[data-metier=fixe]').show();
+    $(this).attr("class", "sel");
+    updateTableTitle();
+}
 
 function filterMetier() {
+	console.log($(this))
     $('a[data-metier]').removeAttr("class");
     var formule = $('a[data-formule][class="sel"]').text();
-    var equip = $('a[data-equip][class="sel"]').text();
     var metier = $(this).data('metier');
-
-    console.log(formule);
-    console.log(metier);
-    console.log(equip);
-
-    $('tr[data-metier]').show();
-    if (equip !== 'Tous') {
-        $('tr:not([data-equip*=' + equip + '])').hide();
+    if (metier === 'Tous') {
+        $('tr[data-metier]').show();
+    } else {
+        $('tr[data-metier*=' + metier + ']').show();
+        $('tr:not([data-metier*=' + metier + '])').hide();
     }
     if (formule === 'Réalisables') {
         $('tr:not([data-formule="Réalisables"])').hide();
     }
-    if (metier !== 'Tous') {
-        $('tr:not([data-metier*=' + metier + '])').hide();
-    }
     $('tr[data-metier=fixe]').show();
     $(this).attr("class", "sel");
-
-    updateComponentsFilter();
-    updateTableTitle()
+    updateTableTitle();
 }
 
 
 function filterCategory() {
-    $('a[data-equip]').removeAttr("class");
+    $('a[data-category]').removeAttr("class");
     var formule = $('a[data-formule][class="sel"]').text();
     var metier = $('a[data-metier][class="sel"]').text();
     var equip = $(this).data('equip');
@@ -319,7 +347,7 @@ function filterCategory() {
 
     $('tr[data-metier]').show();
     if (equip !== 'Tous') {
-        $('tr:not([data-equip*=' + equip + '])').hide();
+        $('tr:not([data-category*=' + equip + '])').hide();
     }
     if (formule === 'Réalisables') {
         $('tr:not([data-formule="Réalisables"])').hide();
@@ -374,7 +402,7 @@ function filterComponents() {
     $('a[data-comp]').removeAttr("class");
     var formule = $('a[data-formule][class="sel"]').text();
     var metier = $('a[data-metier][class="sel"]').text();
-    var equip = $('a[data-equip][class="sel"]').text();
+    var equip = $('a[data-category][class="sel"]').text();
     var comp = $(this).data('comp');
 
     // console.log(formule);
@@ -399,10 +427,10 @@ function filterComponents() {
 
 
 //     if (equip === 'Tous') {
-//         $('tr[data-equip]').show();
+//         $('tr[data-category]').show();
 //     } else {
-//         $('tr[data-equip*=' + equip + ']').show();
-//         $('tr:not([data-equip*=' + equip + '])').hide();
+//         $('tr[data-category*=' + equip + ']').show();
+//         $('tr:not([data-category*=' + equip + '])').hide();
 //     }
 //     if (formule === 'Réalisables') {
 //         $('tr:not([data-formule="Réalisables"])').hide();
@@ -418,8 +446,9 @@ function filterComponents() {
 
 }
 
-function tagFormulas() {
-    let table = document.getElementsByTagName("tbody")[0];
+function updatePageAttributes() {
+    let table = document.getElementsByTagName("table")[0];
+    table.setAttribute('id','formulas-table');
     let smalls = table.getElementsByTagName("small");
 
     for(var i=0;i<smalls.length;i++) {
@@ -428,44 +457,75 @@ function tagFormulas() {
             let value = smalls[i].innerText.split('-')[1].trim();
             switch(value) {
                 case 'Tête':
-                    line.setAttribute('data-equip','tete');
+                    line.setAttribute('data-category','tete');
                     break;
                 case 'Buste':
-                    line.setAttribute('data-equip','buste');
+                    line.setAttribute('data-category','buste');
                     break;
                 case 'Pieds':
-                    line.setAttribute('data-equip','pieds');
+                    line.setAttribute('data-category','pieds');
                     break;
                 case 'Main droite':
-                    line.setAttribute('data-equip','main-droite');
+                    line.setAttribute('data-category','main-droite');
                     break;
                 case 'Main gauche':
-                    line.setAttribute('data-equip','main-gauche');
+                    line.setAttribute('data-category','main-gauche');
                     break;
                 case 'Deux mains':
                 case 'Deux mains d\'arc':
                 case 'Deux mains de fusil':
-                    line.setAttribute('data-equip','deux-mains');
+                    line.setAttribute('data-category','deux-mains');
                     break;
                 // case 'Contenant d\'arc':
                 // case 'Contenant de fusil':
-                //     line.setAttribute('data-equip','contenant');
+                //     line.setAttribute('data-category','contenant');
                 //     break;
                 // case 'Fétiche':
-                //     line.setAttribute('data-equip','fetiche');
+                //     line.setAttribute('data-category','fetiche');
                 //     break;
                 default:
-                    line.setAttribute('data-equip','autres');
+                    line.setAttribute('data-category','autres');
             }
         }
     }
 
     let trs = table.getElementsByTagName("tr");
     for(i=1;i<trs.length;i++) {
-       if(trs[i].getAttribute('data-equip') == null) trs[i].setAttribute('data-equip','autres');
+       if(trs[i].getAttribute('data-category') == null) trs[i].setAttribute('data-equip','autres');
     }
 }
 
+function addCategoryFilters() {
+
+	let bloc = document.getElementById("bloc");
+    let parts = bloc.innerHTML.split('<br><br>');
+
+    // bloc.innerHTML = parts[0] + '</blockquote></div><div class="filtres" style="text-align:center;"><blockquote class="bloc"><strong>Métiers</strong><br>' + parts[1];
+
+
+    let table = bloc.getElementsByTagName("table")[0];
+
+    let extra = document.createElement("div");
+    extra.setAttribute('class',"filtres");
+    extra.setAttribute('style',"text-align:center;");
+
+    extra.innerHTML = '<blockquote id="type-objets" class="bloc"><strong>Types d\'objet</strong><br><a href="#" data-category="Tous">Tous</a> '
+        + '<span><img src="images/interface/puce_small.gif" alt=""> <img src="images/items/7.gif" class="item"><a href="#" data-category="tete">Tête</a> </span> '
+        + '<span><img src="images/interface/puce_small.gif" alt=""> <img src="images/items/48.gif" class="item"><a href="#" data-category="buste">Buste</a> </span> '
+        + '<span><img src="images/interface/puce_small.gif" alt=""> <img src="images/items/8.gif" class="item"><a href="#" data-category="pieds">Pieds</a> </span> '
+        + '<span><img src="images/interface/puce_small.gif" alt=""> <img src="images/items/136.gif" class="item"><img src="images/items/76.gif" class="item"><a href="#" data-category="main-droite">Main droite</a> </span> '
+        + '<span><img src="images/interface/puce_small.gif" alt=""> <img src="images/items/2.gif" class="item"><img src="images/items/24.gif" class="item"><a href="#" data-category="main-gauche">Main gauche</a> </span>'
+        + '<span><img src="images/interface/puce_small.gif" alt=""> <img src="images/items/122.gif" class="item"><img src="images/items/17.gif" class="item"><a href="#" data-category="deux-mains">Deux mains</a> </span>'
+        + '<span><img src="images/interface/puce_small.gif" alt=""> <a href="#" data-category="autres">Autres</a> </span>'
+        + '</blockquote>';
+
+    bloc.insertBefore(extra,table);
+
+	$('a[data-category]').click(filterCategory);
+    // $('a[data-category]').click(filterCategory);
+    $('a[data-category="Tous"]').attr("class", "sel"); // default selected
+
+}
 
 
 function updateTableTitle() {
