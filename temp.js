@@ -392,9 +392,9 @@ function updateComponentsFilter() {
     div.innerHTML = list_icons;
     bloc.insertBefore(div,table);
 
-    $('a[data-comp]').click(filterComponents);
-    $('a[data-metier]').click(updateTableTitle);
-    $('a[data-metier]').click(updateComponentsFilter);
+    // $('a[data-comp]').click(filterComponents);
+    // $('a[data-metier]').click(updateTableTitle);
+    // $('a[data-metier]').click(updateComponentsFilter);
 
 }
 
@@ -524,7 +524,6 @@ function addCategoryFilters() {
     bloc.insertBefore(extra,table);
 
 	$('a[data-category]').click(filterCategory);
-    // $('a[data-category]').click(filterCategory);
     $('a[data-category="Tous"]').attr("class", "sel"); // default selected
 
 }
