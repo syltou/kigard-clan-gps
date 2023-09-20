@@ -178,36 +178,6 @@ function filterFormulas() {
 
 function modifyFormulasPage() {
 
-    // localStorage.setItem("filter1","checked");
-    // localStorage.setItem("filter2","");
-    // localStorage.setItem("filter3","");
-    // localStorage.setItem("filter4","");
-    // localStorage.setItem("filter5","");
-    // localStorage.setItem("filter6","");
-    // localStorage.setItem("filter7","");
-    // localStorage.setItem("filter8","");
-
-
-    // let filter = document.getElementsByTagName("blockquote")[0];
-    // // filter.innerHTML += '<form id="form_formules" method="get" formaction="index.php?p=formules">';
-    // // filter.innerHTML += '<input type="hidden" name="p" value="formules"/>';
-    // filter.innerHTML += '<div>';
-    // filter.innerHTML += '<label><input type="radio" id="filter1" name="formulaFilter" ' + localStorage.getItem("filter1") + ' value="tous" />&nbsp;Tous</label>&nbsp;&nbsp;&nbsp;';
-    // filter.innerHTML += '<label><input type="radio" id="filter2" name="formulaFilter" ' + localStorage.getItem("filter2") + ' value="tete" />&nbsp;Tête</label>&nbsp;&nbsp;&nbsp;';
-    // filter.innerHTML += '<label><input type="radio" id="filter3" name="formulaFilter" ' + localStorage.getItem("filter3") + ' value="buste" />&nbsp;Buste</label>&nbsp;&nbsp;&nbsp;';
-    // filter.innerHTML += '<label><input type="radio" id="filter4" name="formulaFilter" ' + localStorage.getItem("filter4") + ' value="maind" />&nbsp;Main droite</label>&nbsp;&nbsp;&nbsp;';
-    // filter.innerHTML += '<label><input type="radio" id="filter5" name="formulaFilter" ' + localStorage.getItem("filter5") + ' value="maing" />&nbsp;Main gauche</label>&nbsp;&nbsp;&nbsp;';
-    // filter.innerHTML += '<label><input type="radio" id="filter6" name="formulaFilter" ' + localStorage.getItem("filter6") + ' value="pieds" />&nbsp;Pieds</label>&nbsp;&nbsp;&nbsp;';
-    // filter.innerHTML += '<label><input type="radio" id="filter7" name="formulaFilter" ' + localStorage.getItem("filter7") + ' value="fetiche" />&nbsp;Fétiche</label>&nbsp;&nbsp;&nbsp;';
-    // filter.innerHTML += '<label><input type="radio" id="filter8" name="formulaFilter" ' + localStorage.getItem("filter8") + ' value="autres" />&nbsp;Autres</label>&nbsp;&nbsp;&nbsp;';
-    // filter.innerHTML += '</div>';
-    // // filter.innerHTML += '</form>';
-
-    //     let radioButtons = document.getElementsByName("formulaFilter");
-//     for(var i=0;i<radioButtons.length;i++) {
-//         radioButtons[i].addEventListener("click", filterFormulas);
-//     }
-
 	updatePageAttributes();
 	updateOriginalFilters();
 	addCategoryFilters();
@@ -241,66 +211,72 @@ function updateOriginalFilters() {
 }
 
 
-function myfilterFormula() {
-    $('a[data-metier]').removeAttr("class");
-    var formule = $('a[data-formule][class="sel"]').text();
-    var equip = $('a[data-category][class="sel"]').text();
-    var metier = $(this).data('metier');
+// function myfilterFormula() {
+    // $('a[data-metier]').removeAttr("class");
+    // var formule = $('a[data-formule][class="sel"]').text();
+    // var equip = $('a[data-category][class="sel"]').text();
+    // var metier = $(this).data('metier');
 
-    console.log(formule);
-    console.log(metier);
-    console.log(equip);
+    // console.log(formule);
+    // console.log(metier);
+    // console.log(equip);
 
-    $('tr[data-metier]').show();
-    if (equip !== 'Tous') {
-        $('tr:not([data-category*=' + equip + '])').hide();
-    }
-    if (formule === 'Réalisables') {
-        $('tr:not([data-formule="Réalisables"])').hide();
-    }
-    if (metier !== 'Tous') {
-        $('tr:not([data-metier*=' + metier + '])').hide();
-    }
-    $('tr[data-metier=fixe]').show();
-    $(this).attr("class", "sel");
+    // $('tr[data-metier]').show();
+    // if (equip !== 'Tous') {
+        // $('tr:not([data-category*=' + equip + '])').hide();
+    // }
+    // if (formule === 'Réalisables') {
+        // $('tr:not([data-formule="Réalisables"])').hide();
+    // }
+    // if (metier !== 'Tous') {
+        // $('tr:not([data-metier*=' + metier + '])').hide();
+    // }
+    // $('tr[data-metier=fixe]').show();
+    // $(this).attr("class", "sel");
 
-    updateComponentsFilter();
-    updateTableTitle()
-}
+    // updateComponentsFilter();
+    // updateTableTitle()
+// }
 
 
-function myfilterMetier() {
-    $('a[data-metier]').removeAttr("class");
-    var formule = $('a[data-formule][class="sel"]').text();
-    var equip = $('a[data-category][class="sel"]').text();
-    var metier = $(this).data('metier');
+// function myfilterMetier() {
+    // $('a[data-metier]').removeAttr("class");
+    // var formule = $('a[data-formule][class="sel"]').text();
+    // var equip = $('a[data-category][class="sel"]').text();
+    // var metier = $(this).data('metier');
 
-    console.log(formule);
-    console.log(metier);
-    console.log(equip);
+    // console.log(formule);
+    // console.log(metier);
+    // console.log(equip);
 
-    $('tr[data-metier]').show();
-    if (equip !== 'Tous') {
-        $('tr:not([data-category*=' + equip + '])').hide();
-    }
-    if (formule === 'Réalisables') {
-        $('tr:not([data-formule="Réalisables"])').hide();
-    }
-    if (metier !== 'Tous') {
-        $('tr:not([data-metier*=' + metier + '])').hide();
-    }
-    $('tr[data-metier=fixe]').show();
-    $(this).attr("class", "sel");
+    // $('tr[data-metier]').show();
+    // if (equip !== 'Tous') {
+        // $('tr:not([data-category*=' + equip + '])').hide();
+    // }
+    // if (formule === 'Réalisables') {
+        // $('tr:not([data-formule="Réalisables"])').hide();
+    // }
+    // if (metier !== 'Tous') {
+        // $('tr:not([data-metier*=' + metier + '])').hide();
+    // }
+    // $('tr[data-metier=fixe]').show();
+    // $(this).attr("class", "sel");
 
-    updateComponentsFilter();
-    updateTableTitle()
-}
+    // updateComponentsFilter();
+    // updateTableTitle()
+// }
 
 
 function filterFormule() {
     $('a[data-formule]').removeAttr("class");
     var formule = $(this).data('formule');
-    var metier = $('a[data-metier][class="sel"]').text();
+    var metier = $('a[data-metier][class="sel"]').attr('data-metier');
+	var cat = $('a[data-category][class="sel"]').attr('data-category');
+
+	console.log(formule);
+    console.log(metier);
+    console.log(cat);
+
     if (formule === 'Connues') {
         $('tr[data-formule]').show();
     } else {
@@ -310,17 +286,20 @@ function filterFormule() {
     if (metier !== 'Tous') {
         $('tr:not([data-metier*=' + metier + '])').hide();
     }
+	if (cat !== 'Tous') {
+		$('tr:not([data-category*=' + cat + '])').hide();
+	}
     $('tr[data-metier=fixe]').show();
     $(this).attr("class", "sel");
     updateTableTitle();
+    return false;
 }
 
 function filterMetier() {
-	console.log($(this))
     $('a[data-metier]').removeAttr("class");
-    var formule = $('a[data-formule][class="sel"]').text();
+    var formule = $('a[data-formule][class="sel"]').attr('data-formule');
     var metier = $(this).data('metier');
-	var cat = $('a[data-category][class="sel"]').text();
+	var cat = $('a[data-category][class="sel"]').attr('data-category');
 
     if (metier === 'Tous') {
         $('tr[data-metier]').show();
@@ -334,13 +313,14 @@ function filterMetier() {
     $('tr[data-metier=fixe]').show();
     $(this).attr("class", "sel");
     updateTableTitle();
+    return false;
 }
 
 
 function filterCategory() {
     $('a[data-category]').removeAttr("class");
-    var formule = $('a[data-formule][class="sel"]').text();
-    var metier = $('a[data-metier][class="sel"]').text();
+    var formule = $('a[data-formule][class="sel"]').attr('data-formule');
+    var metier = $('a[data-metier][class="sel"]').attr('data-metier');
     var cat = $(this).data('category');
 
     // console.log(formule);
@@ -362,6 +342,7 @@ function filterCategory() {
 
     updateComponentsFilter();
     updateTableTitle()
+    return false;
 }
 
 function updateComponentsFilter() {
@@ -392,7 +373,7 @@ function updateComponentsFilter() {
     div.innerHTML = list_icons;
     bloc.insertBefore(div,table);
 
-    // $('a[data-comp]').click(filterComponents);
+    $('a[data-comp]').click(filterComponents);
     // $('a[data-metier]').click(updateTableTitle);
     // $('a[data-metier]').click(updateComponentsFilter);
 
@@ -401,11 +382,26 @@ function updateComponentsFilter() {
 
 function filterComponents() {
 
+    let prev = $('a[data-comp][class="sel"]').attr("data-comp");
     $('a[data-comp]').removeAttr("class");
-    var formule = $('a[data-formule][class="sel"]').text();
-    var metier = $('a[data-metier][class="sel"]').text();
-    var equip = $('a[data-category][class="sel"]').text();
+    $('a[data-comp]').children("img").removeAttr("width")
+    var formule = $('a[data-formule][class="sel"]').attr("data-formule");
+    var metier = $('a[data-metier][class="sel"]').attr("data-metier");
+    var equip = $('a[data-category][class="sel"]').attr("data-category");
     var comp = $(this).data('comp');
+    $(this).attr("class", "sel");
+
+    console.log(prev);
+    console.log(comp);
+
+    if (comp===prev) {
+        // show all
+    }
+    else {
+        // $(this).children("img").attr("width","27");
+        $("tr[data-formule]").not("[style='display: none;']").find("td:last-child").not(":has([src*='5.gif'])").parent().parent().hide();
+    }
+
 
     // console.log(formule);
     // console.log(metier);
@@ -413,14 +409,14 @@ function filterComponents() {
     // console.log(comp);
 
 
-    // Working try
-    let lines = $("tr[data-formule]").not("[style='display: none;']");
-    let comps = lines.find("td:last");
-    lines.hide();
-    $("tr[data-formule]").not("[style='display: none;']").find("td:last-child").find("img[src*='5.gif']").parent().parent().hide()
-    for(var j=0;j<comps.length;j++) {
-        if(comps[j].innerHTML.includes(comp+".gif")) lines[j].setAttribute("style","display: table-row;");
-    }
+//     // Working try
+//     let lines = $("tr[data-formule]").not("[style='display: none;']");
+//     let comps = lines.find("td:last");
+//     lines.hide();
+//     $("tr[data-formule]").not("[style='display: none;']").find("td:last-child").find("img[src*='5.gif']").parent().parent().hide()
+//     for(var j=0;j<comps.length;j++) {
+//         if(comps[j].innerHTML.includes(comp+".gif")) lines[j].setAttribute("style","display: table-row;");
+//     }
 
 
     // //New try
@@ -445,6 +441,7 @@ function filterComponents() {
 
 //     updateComponentsFilter();
 //     updateTableTitle()
+    return false;
 
 }
 
