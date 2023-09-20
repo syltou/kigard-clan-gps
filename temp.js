@@ -466,7 +466,7 @@ function updatePageAttributes() {
 
 	let trs = table.getElementsByTagName("tr");
 	for(i=1;i<trs.length;i++) {
-	   if(trs[i].getAttribute('data-category') == null) trs[i].setAttribute('data-equip','autres');
+	   if(trs[i].getAttribute('data-category') == null) trs[i].setAttribute('data-category','autres');
 	}
 }
 
