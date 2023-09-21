@@ -4,7 +4,7 @@
 // @contributor Ciol <ciolfire@gmail.com> (100% inspiré de Kigard Fashion Script)
 // @contributor
 // @description Un script facilitant la localisation des membres du clan
-// @version 0.8
+// @version 0.7.5
 // @grant GM_addStyle
 // @match https://tournoi.kigard.fr/*
 // @exclude
@@ -540,7 +540,7 @@ function addComponentFilter() {
 	let table = bloc.getElementsByTagName("table")[0];
 	let list_comp = '<a href="#" data-comp="Tous" hidden=true></a>';
 	for(var i=0;i<components.length;i++) {
-		list_comp += '<span><a href="#" data-comp="' + components[i].split('.')[0] + '"><img src="images/items/' + components[i] + '" class="item"> </a>';
+		list_comp += '<span><a href="#" data-comp="' + components[i].split('.')[0] + '"><img src="images/items/' + components[i] + '" title="' + components_alt[i] + '"> </a>';
 		// if(i<components.length-1) list_comp += '<img src="images/interface/puce_small.gif" alt="">';
 		list_comp += '</span>';
 	}
@@ -563,11 +563,16 @@ function updateTableTitle() {
 
 function listComponents() {
 	components = [];
+	components_alt = [];
 	let imgs = $("tr[data-formule]").not('[style="display: none;"]').children("td:last-child").children("img");
 
 	for(var j=0;j<imgs.length;j++) {
 		let ingr = imgs[j].src.split("/items/")[1];
-		if(!(components.includes(ingr))) components.push(ingr);
+		let name = imgs[j].alt;
+		if(!(components.includes(ingr))) {
+			components.push(ingr);
+			components_alt.push(name);
+		}
 	}
 
 	// console.log(components);
@@ -771,30 +776,52 @@ function addCopyButton(table,type) {
 
 	parent.insertBefore(button,table);
 
-	if(type=='inventory') $("#copy_list").click(copyListInventory);
-
+	switch(type) {
+		  case 'inventory':
+			$("#copy_list").click(copyListInventory);
+			break;
+		  case 'formulas':
+			$("#copy_list").click(copyListFormulas);
+			break;
+		  default:
+	}
 }
 
 function copyListInventory() {
-//	 let tbody = document.getElementsByTagName("tbody");
-//	 console.log(tbody);
-//	 let table = tbody[tbody.length-1];
-//	 console.log(table);
-//	 let trs = table.getElementsByTagName("tr");
-//	 console.log(trs);
-//	 let trs2 = [];
 
-//	 for(var i=0;i<trs.length;i++){
-//		 trs2.push(trs[i].innerHTML);
-//		 let name = trs[i].getElementsByTagName("strong")[0];
-//		 trs[i].innerHTML = name.innerText;
-//	 }
-//	 navigator.clipboard.writeText(table.innerText);
-
-//	 for(i=0;i<trs.length;i++){
-//		 trs[i].innerHTML = trs2[i];
-//	 }
 	navigator.clipboard.writeText($("table:first").children("tbody:first").children("tr").find("strong").each(function(){$(this).text($(this).text()+'\n')}).text());
+}
+
+function copyListFormulas() {
+
+	var formule = $('a[data-formule][class="sel"]').data('formule');
+	var metier = $('a[data-metier][class="sel"]').data('metier');
+	var cat = $('a[data-category][class="sel"]').data('category');
+	var diff = $('a[data-difficulty][class="sel"]').data('difficulty');
+	var comp = $('a[data-comp][class="sel"]').data('comp');
+	var comp_name = $('a[data-comp][class="sel"]').children("img").attr("title");
+
+	let category = ''
+	for (var i=0;i<cat.split('-').length;i++) {
+		category += cat.split('-')[i][0].toUpperCase();
+		for (var j=1;j<cat.split('-')[i].length;j++) {
+			category += cat.split('-')[i][j];
+		}
+		category += ' ';
+	}
+
+	let buffer = "";
+	buffer += "Formules " + formule.toLowerCase().trim();
+    if(metier != 'Tous') buffer += " du métier " + metier.trim();
+    if(cat != 'Tous') buffer += " pour les éléments de type " + category.trim();
+    if(diff != 'Tous') buffer += " et de difficulté " + diff + "%";
+    buffer += ".\n";
+	if(comp != 'Tous') buffer += "Seules les formules contenant l'ingrédient " + comp_name + " sont listées ci-dessous.";
+
+	let liste = $("tr:visible").find("strong").each(function(){$(this).text('- '+$(this).text()+'\n')}).text()
+	console.log(liste);
+
+	navigator.clipboard.writeText(buffer);
 }
 
 
