@@ -4,7 +4,7 @@
 // @contributor Ciol <ciolfire@gmail.com> (100% inspiré de Kigard Fashion Script)
 // @contributor
 // @description Un script facilitant la localisation des membres du clan
-// @version 0.7.5
+// @version 0.8.1
 // @grant GM_addStyle
 // @match https://tournoi.kigard.fr/*
 // @exclude
@@ -816,10 +816,19 @@ function copyListFormulas() {
     if(cat != 'Tous') buffer += " pour les éléments de type " + category.trim();
     if(diff != 'Tous') buffer += " et de difficulté " + diff + "%";
     buffer += ".\n";
-	if(comp != 'Tous') buffer += "Seules les formules contenant l'ingrédient " + comp_name + " sont listées ci-dessous.";
+	if(comp != 'Tous') buffer += "Seules les formules contenant l'ingrédient " + comp_name + " sont listées ci-dessous.\n";
 
-	let liste = $("tr:visible").find("strong").each(function(){$(this).text('- '+$(this).text()+'\n')}).text()
-	console.log(liste);
+	let liste = $("tr:visible");
+    for (i=1;i<liste.length;i++) {
+        buffer += "- " + liste[i].getElementsByTagName("strong")[0].innerText;
+        buffer += " (" + liste[i].getElementsByTagName("td")[1].innerText + "):";
+        let components = liste[i].getElementsByTagName("td")[3].getElementsByTagName("img");
+        let quantity = liste[i].getElementsByTagName("td")[3].innerText.split('x')
+        for (j=0;j<components.length;j++) {
+            buffer += " " + quantity[j] + "x " + components[j].alt;
+        }
+        buffer += "\n";
+    }
 
 	navigator.clipboard.writeText(buffer);
 }
