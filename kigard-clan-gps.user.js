@@ -4,7 +4,7 @@
 // @contributor Ciol <ciolfire@gmail.com> (100% inspiré de Kigard Fashion Script)
 // @contributor
 // @description Un script facilitant la localisation des membres du clan
-// @version 0.8.1
+// @version 0.8.2
 // @grant GM_addStyle
 // @match https://tournoi.kigard.fr/*
 // @exclude
@@ -28,6 +28,7 @@ if (typeof GM_addStyle == 'undefined') {
 }
 
 var components = [];
+var components_alt = [];
 var members = [];
 var mypos, myname;
 var listNames, buttons;
@@ -217,38 +218,38 @@ function updateOriginalFilters() {
 }
 
 
-function updateComponentFilter() {
+// function updateComponentFilter() {
 
-	listComponents();
+// 	listComponents();
 
-	var div;
-	let bloc = document.getElementById("bloc");
-	let table = bloc.getElementsByTagName("table")[0];
-	let list_icons = '<blockquote id="components" class="bloc"><strong>Ingrédients</strong><br><a href="#" data-comp="Tous" hidden=true></a>';
-	for(var i=0;i<components.length;i++) {
-		list_icons += '<span><a href="#" data-comp="' + components[i].split('.')[0] + '"><img src="images/items/' + components[i] + '" class="item"> </a>';
-		// if(i<components.length-1) list_icons += '<img src="images/interface/puce_small.gif" alt="">';
-		list_icons += '</span>';
-	}
-	list_icons += '</blockquote>';
+// 	var div;
+// 	let bloc = document.getElementById("bloc");
+// 	let table = bloc.getElementsByTagName("table")[0];
+// 	let list_icons = '<blockquote id="components" class="bloc"><strong>Ingrédients</strong><br><a href="#" data-comp="Tous" hidden=true></a>';
+// 	for(var i=0;i<components.length;i++) {
+// 		list_icons += '<span><a href="#" data-comp="' + components[i].split('.')[0] + '"><img src="images/items/' + components[i] + '" class="item"> </a>';
+// 		// if(i<components.length-1) list_icons += '<img src="images/interface/puce_small.gif" alt="">';
+// 		list_icons += '</span>';
+// 	}
+// 	list_icons += '</blockquote>';
 
-	let blockquote = document.getElementById("components");
-	if(blockquote) div = blockquote.parentNode;
-	else {
-		div = document.createElement("div");
-		div.setAttribute('class',"filtres");
-		div.setAttribute('style',"text-align:center;");
-		div.setAttribute('class',"filtres");
-		div.setAttribute('style',"text-align:center;");
-	}
+// 	let blockquote = document.getElementById("components");
+// 	if(blockquote) div = blockquote.parentNode;
+// 	else {
+// 		div = document.createElement("div");
+// 		div.setAttribute('class',"filtres");
+// 		div.setAttribute('style',"text-align:center;");
+// 		div.setAttribute('class',"filtres");
+// 		div.setAttribute('style',"text-align:center;");
+// 	}
 
-	div.innerHTML = list_icons;
-	bloc.insertBefore(div,table);
+// 	div.innerHTML = list_icons;
+// 	bloc.insertBefore(div,table);
 
-	$('a[data-comp]').click(selectComponentFilter);
-	// set default filters
-	$('a[data-comp="Tous"]').attr("class", "sel"); // comp Tous
-}
+// 	$('a[data-comp]').click(selectComponentFilter);
+// 	// set default filters
+// 	$('a[data-comp="Tous"]').attr("class", "sel"); // comp Tous
+// }
 
 
 
@@ -259,10 +260,10 @@ function selectFormulaFilter() {
 	var metier = $('a[data-metier][class="sel"]').data('metier');
 	var cat = $('a[data-category][class="sel"]').data('category');
 	var diff = $('a[data-difficulty][class="sel"]').data('difficulty');
-	var comp= $('a[data-comp][class="sel"]').data('comp');
+	var comp = 'Tous';
 	$(this).attr("class", "sel");
-
 	applyFiltering(formule,metier,cat,diff,comp);
+    updateComponentFilter();
 	return false;
 }
 
@@ -272,13 +273,12 @@ function selectMetierFilter() {
 	var metier = $(this).data('metier');
 	var cat = $('a[data-category][class="sel"]').data('category');
 	var diff = $('a[data-difficulty][class="sel"]').data('difficulty');
-	var comp= $('a[data-comp][class="sel"]').data('comp');
+	var comp = 'Tous';
 	$(this).attr("class", "sel");
-
 	applyFiltering(formule,metier,cat,diff,comp);
-	return false;
+    updateComponentFilter();
+    return false;
 }
-
 
 function selectCategoryFilter() {
 	$('a[data-category]').removeAttr("class");
@@ -286,13 +286,12 @@ function selectCategoryFilter() {
 	var metier = $('a[data-metier][class="sel"]').data('metier');
 	var cat = $(this).data('category');
 	var diff = $('a[data-difficulty][class="sel"]').data('difficulty');
-	var comp= $('a[data-comp][class="sel"]').data('comp');
+	var comp = 'Tous';
 	$(this).attr("class", "sel");
-
 	applyFiltering(formule,metier,cat,diff,comp);
-	return false;
+    updateComponentFilter();
+    return false;
 }
-
 
 function selectDifficultyFilter() {
 	$('a[data-difficulty]').removeAttr("class");
@@ -300,16 +299,14 @@ function selectDifficultyFilter() {
 	var metier = $('a[data-metier][class="sel"]').data('metier');
 	var cat = $('a[data-category][class="sel"]').data('category');
 	var diff = $(this).data('difficulty');
-	var comp= $('a[data-comp][class="sel"]').data('comp');
+	var comp = 'Tous';
 	$(this).attr("class", "sel");
-
-
 	applyFiltering(formule,metier,cat,diff,comp);
-	return false;
+    updateComponentFilter();
+    return false;
 }
 
 function selectComponentFilter() {
-
 	let prev = $('a[data-comp][class="sel"]').data('comp');
 	$('a[data-comp]').removeAttr("class");
 	$('a[data-comp]').children("img").removeAttr("width");
@@ -321,17 +318,14 @@ function selectComponentFilter() {
 	if (comp==prev) {
 		comp = 'Tous';
 		$('a[data-comp="Tous"]').attr("class", "sel");
-		$(this).children("img").attr("width","20");
 	}
 	else {
 		$(this).attr("class", "sel");
 		$(this).children("img").attr("width","25");
 	}
-
 	applyFiltering(formule,metier,cat,diff,comp);
 	return false;
 }
-
 
 function applyFiltering(formule,metier,cat,diff,comp) {
 
@@ -366,68 +360,6 @@ function applyFiltering(formule,metier,cat,diff,comp) {
 }
 
 
-
-
-
-function filterComponents() {
-
-
-
-	console.log(prev);
-	console.log(comp);
-
-	if (comp==prev) {
-		// show all, don't hide anything
-		$(this).children("img").attr("width","20");
-	}
-	else {
-		$(this).attr("class", "sel");
-		$(this).children("img").attr("width","25");
-
-	}
-
-
-	// console.log(formule);
-	// console.log(metier);
-	// console.log(equip);
-	// console.log(comp);
-
-
-//	 // Working try
-//	 let lines = $("tr[data-formule]").not("[style='display: none;']");
-//	 let comps = lines.find("td:last");
-//	 lines.hide();
-//	 $("tr[data-formule]").not("[style='display: none;']").find("td:last-child").find("img[src*='5.gif']").parent().parent().hide()
-//	 for(var j=0;j<comps.length;j++) {
-//		 if(comps[j].innerHTML.includes(comp+".gif")) lines[j].setAttribute("style","display: table-row;");
-//	 }
-
-
-	// //New try
-	// $("tr[data-formule]").not("[style='display: none;']").find("td:last-child").not(":has([src*='5.gif'])").parent().parent().hide();
-
-
-
-//	 if (equip === 'Tous') {
-//		 $('tr[data-category]').show();
-//	 } else {
-//		 $('tr[data-category*=' + equip + ']').show();
-//		 $('tr:not([data-category*=' + equip + '])').hide();
-//	 }
-//	 if (formule === 'Réalisables') {
-//		 $('tr:not([data-formule="Réalisables"])').hide();
-//	 }
-//	 if (metier !== 'Tous') {
-//		 $('tr:not([data-metier*=' + metier + '])').hide();
-//	 }
-//	 $('tr[data-metier=fixe]').show();
-//	 $(this).attr("class", "sel");
-
-//	 updateComponentFilter();
-//	 updateTableTitle()
-	return false;
-
-}
 
 function updatePageAttributes() {
 	let table = document.getElementsByTagName("table")[0];
@@ -533,6 +465,7 @@ function addComponentFilter() {
 	listComponents();
 
 	let div = document.createElement("div");
+    div.setAttribute('id',"list-components");
 	div.setAttribute('class',"filtres");
 	div.setAttribute('style',"text-align:center;");
 
@@ -540,9 +473,7 @@ function addComponentFilter() {
 	let table = bloc.getElementsByTagName("table")[0];
 	let list_comp = '<a href="#" data-comp="Tous" hidden=true></a>';
 	for(var i=0;i<components.length;i++) {
-		list_comp += '<span><a href="#" data-comp="' + components[i].split('.')[0] + '"><img src="images/items/' + components[i] + '" title="' + components_alt[i] + '"> </a>';
-		// if(i<components.length-1) list_comp += '<img src="images/interface/puce_small.gif" alt="">';
-		list_comp += '</span>';
+		list_comp += '<span><a href="#" data-comp="' + components[i].split('.')[0] + '"><img src="images/items/' + components[i] + '" title="' + components_alt[i] + '"> </a></span>';
 	}
 
 	div.innerHTML = list_comp;
@@ -555,16 +486,34 @@ function addComponentFilter() {
 
 
 
+function updateComponentFilter() {
+
+    listComponents();
+    let list_comp = '<a href="#" data-comp="Tous" hidden=true></a>';
+	for(var i=0;i<components.length;i++) {
+		list_comp += '<span><a href="#" data-comp="' + components[i].split('.')[0] + '"><img src="images/items/' + components[i] + '" title="' + components_alt[i] + '"> </a></span>';
+	}
+
+    let div = document.getElementById("list-components");
+    div.innerHTML = list_comp;
+
+    $('a[data-comp]').click(selectComponentFilter);
+	// set default filters
+	$('a[data-comp="Tous"]').attr("class", "sel");
+}
+
+
+
 
 function updateTableTitle() {
-	let displayed_lines = $("tr[data-formule]").not('[style="display: none;"]');
+	let displayed_lines = $("tr[data-formule]:visible");
 	$("table:first").children("tbody:first").children("tr:first").children("td:first")[0].innerText = displayed_lines.length + " formules";
 }
 
 function listComponents() {
 	components = [];
 	components_alt = [];
-	let imgs = $("tr[data-formule]").not('[style="display: none;"]').children("td:last-child").children("img");
+	let imgs = $("tr[data-formule]:visible").children("td:last-child").children("img");
 
 	for(var j=0;j<imgs.length;j++) {
 		let ingr = imgs[j].src.split("/items/")[1];
@@ -811,15 +760,14 @@ function copyListFormulas() {
 	}
 
 	let buffer = "";
-	buffer += "Formules " + formule.toLowerCase().trim();
-    if(metier != 'Tous') buffer += " du métier " + metier.trim();
+	buffer += "Formules " + metier.trim();
+    if(diff != 'Tous') buffer += " de difficulté " + diff + "%";
     if(cat != 'Tous') buffer += " pour les éléments de type " + category.trim();
-    if(diff != 'Tous') buffer += " et de difficulté " + diff + "%";
-    buffer += ".\n";
-	if(comp != 'Tous') buffer += "Seules les formules contenant l'ingrédient " + comp_name + " sont listées ci-dessous.\n";
+    if(comp != 'Tous') buffer += " contenant l'ingrédient " + comp_name.trim();
+    buffer += ":\n";
 
-	let liste = $("tr:visible");
-    for (i=1;i<liste.length;i++) {
+	let liste = $("tr[data-formule]:visible");
+    for (i=0;i<liste.length;i++) {
         buffer += "- " + liste[i].getElementsByTagName("strong")[0].innerText;
         buffer += " (" + liste[i].getElementsByTagName("td")[1].innerText + "):";
         let components = liste[i].getElementsByTagName("td")[3].getElementsByTagName("img");
