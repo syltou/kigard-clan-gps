@@ -4,7 +4,7 @@
 // @contributor Ciol <ciolfire@gmail.com> (100% inspiré de Kigard Fashion Script)
 // @contributor
 // @description Un script facilitant la localisation des membres du clan
-// @version 0.7.5
+// @version 0.8.2
 // @grant GM_addStyle
 // @match https://tournoi.kigard.fr/*
 // @exclude
@@ -28,6 +28,7 @@ if (typeof GM_addStyle == 'undefined') {
 }
 
 var components = [];
+var components_alt = [];
 var members = [];
 var mypos, myname;
 var listNames, buttons;
@@ -46,7 +47,7 @@ var id_equip = [1,2,7,8,9,10,11,14,16,17,18,19,20,21,22,23,24,25,27,28,29,30,31,
 			   185,186,188,189,190,191,192,193,194,195,196,197,198,199,200,
 			   203,204,205,206,207,212,216,224,225,226,227,228,229,230,231,232,233,
 			   236,237,239,241,242,243,244,245,246,249,250,252,256,257,260,261,267,
-			   268,269,270,271,275,276,284,285,286,287,289,290,291,292,294,296,297,
+			   268,269,270,271,275,284,285,286,287,289,290,291,292,294,296,297,
 			   306,307,308,309,311,312,313,316,317,318,319,326,327,328,329,331,333,
 			   334,335,336,337,344,350];
 
@@ -56,7 +57,7 @@ var id_conso = [3,4,15,26,36,38,40,41,42,43,44,45,46,61,63,96,97,113,131,153,154
 
 var id_resso = [5,6,12,13,35,65,66,67,68,69,70,71,72,73,89,90,112,
 				142,143,144,145,171,172,173,174,175,176,187,209,210,220,223,254,255,262,
-				274,283,293,295,298,299,300,301,302,310,314,315,338,341,342,343];
+				274,276,283,293,295,298,299,300,301,302,310,314,315,338,341,342,343];
 
 
 var id_left = [37,50,88,94,99,120,128,130,132,133,134,135,139,158,169,170,201,202,
@@ -102,7 +103,7 @@ if (page == "inventaire" && (inv == "Equipement" || inv == "Consommable" || inv 
 
 if (page == "gestion_stock") {
 	let mule = urlParams.get('id_monstre');
-	saveInventory(mule);
+	saveMulet(mule);
 	let bloc = document.getElementById("bloc");
 	addCopyButton(bloc.getElementsByTagName("table")[0],"inventory");
 }
@@ -184,7 +185,7 @@ function modifyFormulasPage() {
 	addDifficultyFilter();
 
 
-	// updateComponentFilter();
+	addComponentFilter();
 	updateTableTitle();
 
 	addCopyButton($('#formulas-table')[0],"formulas");
@@ -193,7 +194,7 @@ function modifyFormulasPage() {
 
 
 function updateOriginalFilters() {
-	
+
 	let bloc = document.getElementById("bloc");
 	let parts = bloc.innerHTML.split('<br><br>');
 
@@ -217,38 +218,40 @@ function updateOriginalFilters() {
 }
 
 
-function updateComponentFilter() {
+// function updateComponentFilter() {
 
-	listComponents();
+// 	listComponents();
 
-	var div;
-	let bloc = document.getElementById("bloc");
-	let table = bloc.getElementsByTagName("table")[0];
-	let list_icons = '<blockquote id="components" class="bloc"><strong>Ingrédients</strong><br><a href="#" data-comp="Tous" hidden=true></a>';
-	for(var i=0;i<components.length;i++) {
-		list_icons += '<span><a href="#" data-comp="' + components[i].split('.')[0] + '"><img src="images/items/' + components[i] + '" class="item"> </a>';
-		// if(i<components.length-1) list_icons += '<img src="images/interface/puce_small.gif" alt="">';
-		list_icons += '</span>';
-	}
-	list_icons += '</blockquote>';
+// 	var div;
+// 	let bloc = document.getElementById("bloc");
+// 	let table = bloc.getElementsByTagName("table")[0];
+// 	let list_icons = '<blockquote id="components" class="bloc"><strong>Ingrédients</strong><br><a href="#" data-comp="Tous" hidden=true></a>';
+// 	for(var i=0;i<components.length;i++) {
+// 		list_icons += '<span><a href="#" data-comp="' + components[i].split('.')[0] + '"><img src="images/items/' + components[i] + '" class="item"> </a>';
+// 		// if(i<components.length-1) list_icons += '<img src="images/interface/puce_small.gif" alt="">';
+// 		list_icons += '</span>';
+// 	}
+// 	list_icons += '</blockquote>';
 
-	let blockquote = document.getElementById("components");
-	if(blockquote) div = blockquote.parentNode;
-	else {
-		div = document.createElement("div");
-		div.setAttribute('class',"filtres");
-		div.setAttribute('style',"text-align:center;");
-		div.setAttribute('class',"filtres");
-		div.setAttribute('style',"text-align:center;");
-	}
+// 	let blockquote = document.getElementById("components");
+// 	if(blockquote) div = blockquote.parentNode;
+// 	else {
+// 		div = document.createElement("div");
+// 		div.setAttribute('class',"filtres");
+// 		div.setAttribute('style',"text-align:center;");
+// 		div.setAttribute('class',"filtres");
+// 		div.setAttribute('style',"text-align:center;");
+// 	}
 
-	div.innerHTML = list_icons;
-	bloc.insertBefore(div,table);
+// 	div.innerHTML = list_icons;
+// 	bloc.insertBefore(div,table);
 
-	$('a[data-comp]').click(selectComponentFilter);
-	// set default filters
-	$('a[data-comp="Tous"]').attr("class", "sel"); // comp Tous
-}
+// 	$('a[data-comp]').click(selectComponentFilter);
+// 	// set default filters
+// 	$('a[data-comp="Tous"]').attr("class", "sel"); // comp Tous
+// }
+
+
 
 
 function selectFormulaFilter() {
@@ -257,10 +260,10 @@ function selectFormulaFilter() {
 	var metier = $('a[data-metier][class="sel"]').data('metier');
 	var cat = $('a[data-category][class="sel"]').data('category');
 	var diff = $('a[data-difficulty][class="sel"]').data('difficulty');
-	var comp= $('a[data-comp][class="sel"]').data('comp');
+	var comp = 'Tous';
 	$(this).attr("class", "sel");
-
 	applyFiltering(formule,metier,cat,diff,comp);
+    updateComponentFilter();
 	return false;
 }
 
@@ -270,13 +273,12 @@ function selectMetierFilter() {
 	var metier = $(this).data('metier');
 	var cat = $('a[data-category][class="sel"]').data('category');
 	var diff = $('a[data-difficulty][class="sel"]').data('difficulty');
-	var comp= $('a[data-comp][class="sel"]').data('comp');
+	var comp = 'Tous';
 	$(this).attr("class", "sel");
-
 	applyFiltering(formule,metier,cat,diff,comp);
-	return false;
+    updateComponentFilter();
+    return false;
 }
-
 
 function selectCategoryFilter() {
 	$('a[data-category]').removeAttr("class");
@@ -284,13 +286,12 @@ function selectCategoryFilter() {
 	var metier = $('a[data-metier][class="sel"]').data('metier');
 	var cat = $(this).data('category');
 	var diff = $('a[data-difficulty][class="sel"]').data('difficulty');
-	var comp= $('a[data-comp][class="sel"]').data('comp');
+	var comp = 'Tous';
 	$(this).attr("class", "sel");
-
 	applyFiltering(formule,metier,cat,diff,comp);
-	return false;
+    updateComponentFilter();
+    return false;
 }
-
 
 function selectDifficultyFilter() {
 	$('a[data-difficulty]').removeAttr("class");
@@ -298,18 +299,18 @@ function selectDifficultyFilter() {
 	var metier = $('a[data-metier][class="sel"]').data('metier');
 	var cat = $('a[data-category][class="sel"]').data('category');
 	var diff = $(this).data('difficulty');
-	var comp= $('a[data-comp][class="sel"]').data('comp');
+	var comp = 'Tous';
 	$(this).attr("class", "sel");
-
-
 	applyFiltering(formule,metier,cat,diff,comp);
-	return false;
+    updateComponentFilter();
+    return false;
 }
 
 function selectComponentFilter() {
-	
 	let prev = $('a[data-comp][class="sel"]').data('comp');
 	$('a[data-comp]').removeAttr("class");
+	// $('a[data-comp]').children("img").removeAttr("width");
+	$('a[data-comp]').children("img").removeAttr("style");
 	var formule = $('a[data-formule][class="sel"]').data('formule');
 	var metier = $('a[data-metier][class="sel"]').data('metier');
 	var cat = $('a[data-category][class="sel"]').data('category');
@@ -317,20 +318,26 @@ function selectComponentFilter() {
 	var comp = $(this).data('comp');
 	if (comp==prev) {
 		comp = 'Tous';
-		$(this).children("img").attr("width","20");
+		$('a[data-comp="Tous"]').attr("class", "sel");
 	}
 	else {
 		$(this).attr("class", "sel");
-		$(this).children("img").attr("width","25");
+		// $(this).children("img").attr("width","25");
+		$('a[data-comp]').not('[class="sel"]').children("img").attr("style","opacity:0.4");
 	}
-	
 	applyFiltering(formule,metier,cat,diff,comp);
 	return false;
 }
 
-
 function applyFiltering(formule,metier,cat,diff,comp) {
-	
+
+	console.log(formule);
+	console.log(metier);
+	console.log(cat);
+	console.log(diff);
+	console.log(comp);
+
+
 	$('tr[data-formule]').show();
 	if (formule != 'Connues') {
 		$('tr[data-formule="Connues"]').hide();
@@ -343,83 +350,18 @@ function applyFiltering(formule,metier,cat,diff,comp) {
 	}
 	if (diff != 'Tous') {
 		// $('td:nth-child(2):not(:contains("' + diff + '"))').parent().hide();
-		$('td:nth-child(2)').filter(function() { 
+		$('td:nth-child(2)').filter(function() {
 			return $(this).text() !== diff+'%';
 		}).parent('[data-formule]').hide();
 	}
 	if (comp != 'Tous') {
-		$('td:last-child').not(':has([src*="'+comp+'.gif"])').parent('[data-formule]').hide();
+		$('td:last-child').not(':has([src*="items/'+comp+'.gif"])').parent('[data-formule]').hide();
 	}
-	
 	$('tr[data-metier=fixe]').show();
-	
-	updateComponentFilter();
 	updateTableTitle()
 }
 
 
-
-
-
-function filterComponents() {
-
-
-	
-	console.log(prev);
-	console.log(comp);
-
-	if (comp==prev) {
-		// show all, don't hide anything
-		$(this).children("img").attr("width","20");
-	}
-	else {
-		$(this).attr("class", "sel");
-		$(this).children("img").attr("width","25");
-		
-	}
-
-
-	// console.log(formule);
-	// console.log(metier);
-	// console.log(equip);
-	// console.log(comp);
-
-
-//	 // Working try
-//	 let lines = $("tr[data-formule]").not("[style='display: none;']");
-//	 let comps = lines.find("td:last");
-//	 lines.hide();
-//	 $("tr[data-formule]").not("[style='display: none;']").find("td:last-child").find("img[src*='5.gif']").parent().parent().hide()
-//	 for(var j=0;j<comps.length;j++) {
-//		 if(comps[j].innerHTML.includes(comp+".gif")) lines[j].setAttribute("style","display: table-row;");
-//	 }
-
-
-	// //New try
-	// $("tr[data-formule]").not("[style='display: none;']").find("td:last-child").not(":has([src*='5.gif'])").parent().parent().hide();
-
-
-
-//	 if (equip === 'Tous') {
-//		 $('tr[data-category]').show();
-//	 } else {
-//		 $('tr[data-category*=' + equip + ']').show();
-//		 $('tr:not([data-category*=' + equip + '])').hide();
-//	 }
-//	 if (formule === 'Réalisables') {
-//		 $('tr:not([data-formule="Réalisables"])').hide();
-//	 }
-//	 if (metier !== 'Tous') {
-//		 $('tr:not([data-metier*=' + metier + '])').hide();
-//	 }
-//	 $('tr[data-metier=fixe]').show();
-//	 $(this).attr("class", "sel");
-
-//	 updateComponentFilter();
-//	 updateTableTitle()
-	return false;
-
-}
 
 function updatePageAttributes() {
 	let table = document.getElementsByTagName("table")[0];
@@ -519,18 +461,69 @@ function addDifficultyFilter() {
 }
 
 
+
+function addComponentFilter() {
+
+	listComponents();
+
+	let div = document.createElement("div");
+    div.setAttribute('id',"list-components");
+	div.setAttribute('class',"filtres");
+	div.setAttribute('style',"text-align:center;");
+
+	let bloc = document.getElementById("bloc");
+	let table = bloc.getElementsByTagName("table")[0];
+	let list_comp = '<a href="#" data-comp="Tous" hidden=true></a>';
+	for(var i=0;i<components.length;i++) {
+		list_comp += '<span><a href="#" data-comp="' + components[i].split('.')[0] + '"><img src="images/items/' + components[i] + '" title="' + components_alt[i] + '"> </a></span>';
+	}
+
+	div.innerHTML = list_comp;
+	bloc.insertBefore(div,table);
+
+	$('a[data-comp]').click(selectComponentFilter);
+	// set default filters
+	$('a[data-comp="Tous"]').attr("class", "sel"); // comp Tous
+}
+
+
+
+function updateComponentFilter() {
+
+    listComponents();
+    let list_comp = '<a href="#" data-comp="Tous" hidden=true></a>';
+	for(var i=0;i<components.length;i++) {
+		list_comp += '<span><a href="#" data-comp="' + components[i].split('.')[0] + '"><img src="images/items/' + components[i] + '" title="' + components_alt[i] + '"> </a></span>';
+	}
+
+    let div = document.getElementById("list-components");
+    div.innerHTML = list_comp;
+
+    $('a[data-comp]').click(selectComponentFilter);
+	// set default filters
+	$('a[data-comp="Tous"]').attr("class", "sel");
+}
+
+
+
+
 function updateTableTitle() {
-	let displayed_lines = $("tr[data-formule]").not('[style="display: none;"]');
+	let displayed_lines = $("tr[data-formule]:visible");
 	$("table:first").children("tbody:first").children("tr:first").children("td:first")[0].innerText = displayed_lines.length + " formules";
 }
 
 function listComponents() {
 	components = [];
-	let imgs = $("tr[data-formule]").not('[style="display: none;"]').children("td:last-child").children("img");
+	components_alt = [];
+	let imgs = $("tr[data-formule]:visible").children("td:last-child").children("img");
 
 	for(var j=0;j<imgs.length;j++) {
 		let ingr = imgs[j].src.split("/items/")[1];
-		if(!(components.includes(ingr))) components.push(ingr);
+		let name = imgs[j].alt;
+		if(!(components.includes(ingr))) {
+			components.push(ingr);
+			components_alt.push(name);
+		}
 	}
 
 	// console.log(components);
@@ -580,7 +573,7 @@ function saveInventory(inv) {
 	table = "";
 	for (i=0;i<lines.length;i++){
 		if(lines[i].parentNode.tagName == "TD") {
-			table += "<tr>";
+			table += "<tr data-inv='" + inv + "'>";
 			cell = lines[i].parentNode.outerHTML;
 			table += cell;
 			table += "</tr>";
@@ -591,6 +584,32 @@ function saveInventory(inv) {
 	localStorage.setItem(inv+'_ts',ts);
 	// console.log(ts);
 }
+
+function saveMulet(mule) {
+	var i, lines, cell, table, inv;
+	lines = document.getElementsByTagName('table')[0].getElementsByClassName("item");
+	// console.log(lines.length)
+	table = "";
+	for (i=0;i<lines.length;i++){
+		if(lines[i].parentNode.tagName == "TD") {
+			
+			let icon = lines[i].src.split('items/')[1].split('.gif')[0];
+			if (id_equip.includes(~~icon)) inv = "Equipement";
+			if (id_conso.includes(~~icon)) inv = "Consommable";
+			if (id_resso.includes(~~icon)) inv = "Ressource";
+			
+			table += "<tr data-inv='" + inv + "'>";
+			cell = lines[i].parentNode.outerHTML;
+			table += cell;
+			table += "</tr>";
+		}
+	}
+	localStorage.setItem(mule,table);
+	let ts = (new Date()).getTime();
+	localStorage.setItem(mule+'_ts',ts);
+	// console.log(ts);
+}
+
 
 function mergeInventory() {
 
@@ -712,6 +731,23 @@ function createInventory() {
 		myhtml += '</td></tr>';
 	}
 	myhtml += '</tbody></table><input name="refresh_inv" type="submit" value="Modifier" form="form_inv"></form><br><br>';
+	
+	// -------------------------------------------------------------------
+	
+	let extra = document.createElement("div");
+	extra.setAttribute('class',"filtres");
+	extra.setAttribute('hidden',"true");
+	extra.setAttribute('style',"text-align:center;");
+
+	extra.innerHTML = '<blockquote class="bloc"><strong>Catégories</strong><br><a href="#" data-inv="Tous">Tout</a> '
+		+ '<span><img src="images/interface/puce_small.gif" alt=""> <img src="images/items/74.gif" class="item"><a href="#" data-inv="Equipement">Équipements</a> </span> '
+		+ '<span><img src="images/interface/puce_small.gif" alt=""> <img src="images/items/3.gif" class="item"><a href="#" data-inv="Consommable">Consommables</a> </span> '
+		+ '<span><img src="images/interface/puce_small.gif" alt=""> <img src="images/items/5.gif" class="item"><a href="#" data-inv="Ressource">Ressources</a> </span> '
+		+ '</blockquote>';
+	myhtml += extra.outerHTML;
+	
+	// -------------------------------------------------------------------
+	
 	let table = mergeInventory();
 	myhtml += table;
 
@@ -721,6 +757,10 @@ function createInventory() {
 	addCopyButton(document.getElementById("inventaire_complet"));
 
 }
+
+
+
+
 
 
 function addCopyButton(table,type) {
@@ -734,30 +774,60 @@ function addCopyButton(table,type) {
 
 	parent.insertBefore(button,table);
 
-	if(type=='inventory') $("#copy_list").click(copyListInventory);
-
+	switch(type) {
+		  case 'inventory':
+			$("#copy_list").click(copyListInventory);
+			break;
+		  case 'formulas':
+			$("#copy_list").click(copyListFormulas);
+			break;
+		  default:
+	}
 }
 
 function copyListInventory() {
-//	 let tbody = document.getElementsByTagName("tbody");
-//	 console.log(tbody);
-//	 let table = tbody[tbody.length-1];
-//	 console.log(table);
-//	 let trs = table.getElementsByTagName("tr");
-//	 console.log(trs);
-//	 let trs2 = [];
 
-//	 for(var i=0;i<trs.length;i++){
-//		 trs2.push(trs[i].innerHTML);
-//		 let name = trs[i].getElementsByTagName("strong")[0];
-//		 trs[i].innerHTML = name.innerText;
-//	 }
-//	 navigator.clipboard.writeText(table.innerText);
-
-//	 for(i=0;i<trs.length;i++){
-//		 trs[i].innerHTML = trs2[i];
-//	 }
 	navigator.clipboard.writeText($("table:first").children("tbody:first").children("tr").find("strong").each(function(){$(this).text($(this).text()+'\n')}).text());
+}
+
+function copyListFormulas() {
+
+	var formule = $('a[data-formule][class="sel"]').data('formule');
+	var metier = $('a[data-metier][class="sel"]').data('metier');
+	var cat = $('a[data-category][class="sel"]').data('category');
+	var diff = $('a[data-difficulty][class="sel"]').data('difficulty');
+	var comp = $('a[data-comp][class="sel"]').data('comp');
+	var comp_name = $('a[data-comp][class="sel"]').children("img").attr("title");
+
+	let category = ''
+	for (var i=0;i<cat.split('-').length;i++) {
+		category += cat.split('-')[i][0].toUpperCase();
+		for (var j=1;j<cat.split('-')[i].length;j++) {
+			category += cat.split('-')[i][j];
+		}
+		category += ' ';
+	}
+
+	let buffer = "";
+	buffer += "Formules " + metier.trim();
+    if(diff != 'Tous') buffer += " de difficulté " + diff + "%";
+    if(cat != 'Tous') buffer += " pour les éléments de type " + category.trim();
+    if(comp != 'Tous') buffer += " contenant l'ingrédient " + comp_name.trim();
+    buffer += ":\n";
+
+	let liste = $("tr[data-formule]:visible");
+    for (i=0;i<liste.length;i++) {
+        buffer += "- " + liste[i].getElementsByTagName("strong")[0].innerText;
+        buffer += " (" + liste[i].getElementsByTagName("td")[1].innerText + "):";
+        let components = liste[i].getElementsByTagName("td")[3].getElementsByTagName("img");
+        let quantity = liste[i].getElementsByTagName("td")[3].innerText.split('x')
+        for (j=0;j<components.length;j++) {
+            buffer += " " + quantity[j] + "x " + components[j].alt;
+        }
+        buffer += "\n";
+    }
+
+	navigator.clipboard.writeText(buffer);
 }
 
 
