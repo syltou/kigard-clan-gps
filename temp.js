@@ -27,6 +27,15 @@ if (typeof GM_addStyle == 'undefined') {
   };
 }
 
+
+if(window.location == "https://tournoi.kigard.fr/liste_pj.php") {
+
+    testListePJ();
+    return;
+}
+
+
+
 var components = [];
 var components_alt = [];
 var members = [];
@@ -85,7 +94,7 @@ if (page == "options") {
 }
 
 if (page == "empathie") {
-	findMules();
+
 	addButtonEmpathie();
 }
 
@@ -95,6 +104,10 @@ if(page == "formules") {
 	modifyFormulasPage();
 }
 
+
+
+
+
 if (page == "inventaire" && (inv == "Equipement" || inv == "Consommable" || inv == "Ressource")) {
 	saveInventory(inv);
 	let bloc = document.getElementById("bloc");
@@ -102,8 +115,8 @@ if (page == "inventaire" && (inv == "Equipement" || inv == "Consommable" || inv 
 }
 
 if (page == "gestion_stock") {
-	let mule = urlParams.get('id_monstre');
-	saveMulet(mule);
+	// let mule = urlParams.get('id_monstre');
+	// saveMulet(mule);
 	let bloc = document.getElementById("bloc");
 	addCopyButton(bloc.getElementsByTagName("table")[0],"inventory");
 }
@@ -114,6 +127,7 @@ if (page == "messagerie" && subp == "nouveau_message") {
 }
 
 if (page == "clan" && subp == "membres") {
+    $('img[src="images/metiers/puacheur.gif"]')[0].src="images/metiers/pecheur.gif" ;
 	listNames = getNames();
 	getPositions();
 	localStorage.setItem("members",members);
@@ -128,6 +142,7 @@ if (page == 'vue') {
 }
 
 if (page == 'InventaireComplet') {
+	updateInventory();
 	createInventory();
 
 }
@@ -136,6 +151,23 @@ changeMenu();
 
 if (page == "arene") {
 	orderArenas();
+}
+
+
+function testListePJ() {
+
+    let listPJ = $("td:first-child").children("a");
+    for(var i=0;i<5;i++) {
+        setTimeout(parseEquipment, 500*i, listPJ[i]);
+    }
+}
+
+function parseEquipment(link) {
+
+    let w=window.open(link.href);
+    console.log(document.getElementsByTagName("h3")[0]);
+    w.close();
+
 }
 
 
@@ -186,6 +218,7 @@ function modifyFormulasPage() {
 
 
 	addComponentFilter();
+	addSearchBar();
 	updateTableTitle();
 
 	addCopyButton($('#formulas-table')[0],"formulas");
@@ -217,6 +250,62 @@ function updateOriginalFilters() {
 
 }
 
+function updateInventory() {
+	window.open("https://tournoi.kigard.fr/index.php?p=inventaire&genre=Equipement",'_self');
+	saveInventory('Equipement');
+	console.log( "Equipement updated!" );
+	// });
+	// w.close();
+
+	window.open("https://tournoi.kigard.fr/index.php?p=inventaire&genre=Consommable",'_self');
+	// // w.resizeTo(0,0);
+	// // w.moveTo(0,w.screen.availHeight+10);
+	// $( w.document ).ready(function() {
+	saveInventory('Consommable');
+	console.log( "Consommable updated!" );
+	// });
+	// w.close();
+
+	window.open("https://tournoi.kigard.fr/index.php?p=inventaire&genre=Ressource",'_self');
+	// // w.resizeTo(0,0);
+	// // w.moveTo(0,w.screen.availHeight+10);
+	// $( w.document ).ready(function() {
+	saveInventory('Ressource');
+	console.log( "Ressource updated!" );
+	// });
+	// w.close();
+
+	window.open("https://tournoi.kigard.fr/index.php?p=empathie",'_self');
+	// // w.resizeTo(0,0);
+	// // w.moveTo(0,w.screen.availHeight+10);
+	// $( w.document ).ready(function() {
+	findMules();
+	console.log( "Mules found!" );
+	// });
+	// w.close();
+
+	// temp = localStorage.getItem("mules_id");
+	// let mules_id = temp ? temp.split(',') : [];
+	// temp = localStorage.getItem("mules_name");
+	// let mules_name = temp ? temp.split(',') : [];
+
+	// console.log(mules_id)
+	// console.log(mules_name)
+
+	// for(var i=0;i<mules_id.length;i++) {
+		// w=window.open("https://tournoi.kigard.fr/index.php?p=gestion_stock&id_monstre=" + mules_id[i]);
+		// // w.resizeTo(0,0);
+		// // w.moveTo(0,w.screen.availHeight+10);
+		// $( w.document ).ready(function() {
+			// saveMulet(mules_id[i],w);;
+			// console.log( "Mule "+ mules_name[i] +" updated!" );
+		// });
+		// w.close();
+	// }
+
+	// window.open("https://tournoi.kigard.fr/index.php?p=InventaireComplet",'_self');
+
+}
 
 // function updateComponentFilter() {
 
@@ -256,53 +345,57 @@ function updateOriginalFilters() {
 
 function selectFormulaFilter() {
 	$('a[data-formule]').removeAttr("class");
-	var formule = $(this).data('formule');
-	var metier = $('a[data-metier][class="sel"]').data('metier');
-	var cat = $('a[data-category][class="sel"]').data('category');
-	var diff = $('a[data-difficulty][class="sel"]').data('difficulty');
-	var comp = 'Tous';
+	// var formule = $(this).data('formule');
+	// var metier = $('a[data-metier][class="sel"]').data('metier');
+	// var cat = $('a[data-category][class="sel"]').data('category');
+	// var diff = $('a[data-difficulty][class="sel"]').data('difficulty');
+	// var comp = 'Tous';
 	$(this).attr("class", "sel");
-	applyFiltering(formule,metier,cat,diff,comp);
+	$(document).ready(applyFiltering());//formule,metier,cat,diff,comp);
     updateComponentFilter();
+	$('#search')[0].value = '';
 	return false;
 }
 
 function selectMetierFilter() {
 	$('a[data-metier]').removeAttr("class");
-	var formule = $('a[data-formule][class="sel"]').data('formule');
-	var metier = $(this).data('metier');
-	var cat = $('a[data-category][class="sel"]').data('category');
-	var diff = $('a[data-difficulty][class="sel"]').data('difficulty');
-	var comp = 'Tous';
+	// var formule = $('a[data-formule][class="sel"]').data('formule');
+	// var metier = $(this).data('metier');
+	// var cat = $('a[data-category][class="sel"]').data('category');
+	// var diff = $('a[data-difficulty][class="sel"]').data('difficulty');
+	// var comp = 'Tous';
 	$(this).attr("class", "sel");
-	applyFiltering(formule,metier,cat,diff,comp);
+	$(document).ready(applyFiltering());//formule,metier,cat,diff,comp);
     updateComponentFilter();
+	$('#search')[0].value = '';
     return false;
 }
 
 function selectCategoryFilter() {
 	$('a[data-category]').removeAttr("class");
-	var formule = $('a[data-formule][class="sel"]').data('formule');
-	var metier = $('a[data-metier][class="sel"]').data('metier');
-	var cat = $(this).data('category');
-	var diff = $('a[data-difficulty][class="sel"]').data('difficulty');
-	var comp = 'Tous';
+	// var formule = $('a[data-formule][class="sel"]').data('formule');
+	// var metier = $('a[data-metier][class="sel"]').data('metier');
+	// var cat = $(this).data('category');
+	// var diff = $('a[data-difficulty][class="sel"]').data('difficulty');
+	// var comp = 'Tous';
 	$(this).attr("class", "sel");
-	applyFiltering(formule,metier,cat,diff,comp);
+	$(document).ready(applyFiltering());//formule,metier,cat,diff,comp);
     updateComponentFilter();
+	$('#search')[0].value = '';
     return false;
 }
 
 function selectDifficultyFilter() {
 	$('a[data-difficulty]').removeAttr("class");
-	var formule = $('a[data-formule][class="sel"]').data('formule');
-	var metier = $('a[data-metier][class="sel"]').data('metier');
-	var cat = $('a[data-category][class="sel"]').data('category');
-	var diff = $(this).data('difficulty');
-	var comp = 'Tous';
+	// var formule = $('a[data-formule][class="sel"]').data('formule');
+	// var metier = $('a[data-metier][class="sel"]').data('metier');
+	// var cat = $('a[data-category][class="sel"]').data('category');
+	// var diff = $(this).data('difficulty');
+	// var comp = 'Tous';
 	$(this).attr("class", "sel");
-	applyFiltering(formule,metier,cat,diff,comp);
+	$(document).ready(applyFiltering());//formule,metier,cat,diff,comp);
     updateComponentFilter();
+	$('#search')[0].value = '';
     return false;
 }
 
@@ -311,10 +404,10 @@ function selectComponentFilter() {
 	$('a[data-comp]').removeAttr("class");
 	// $('a[data-comp]').children("img").removeAttr("width");
 	$('a[data-comp]').children("img").removeAttr("style");
-	var formule = $('a[data-formule][class="sel"]').data('formule');
-	var metier = $('a[data-metier][class="sel"]').data('metier');
-	var cat = $('a[data-category][class="sel"]').data('category');
-	var diff= $('a[data-difficulty][class="sel"]').data('difficulty');
+	// var formule = $('a[data-formule][class="sel"]').data('formule');
+	// var metier = $('a[data-metier][class="sel"]').data('metier');
+	// var cat = $('a[data-category][class="sel"]').data('category');
+	// var diff= $('a[data-difficulty][class="sel"]').data('difficulty');
 	var comp = $(this).data('comp');
 	if (comp==prev) {
 		comp = 'Tous';
@@ -325,18 +418,69 @@ function selectComponentFilter() {
 		// $(this).children("img").attr("width","25");
 		$('a[data-comp]').not('[class="sel"]').children("img").attr("style","opacity:0.4");
 	}
+	$(document).ready(filterComponents(comp));//formule,metier,cat,diff,comp);
+	$('#search')[0].value = '';
+	return false;
+}
+
+
+function selectComponentFilter2() {
+	let selected = [];
+	let sel_comp = $('a[data-comp][class="sel"]');
+	if( sel_comp.length==1 && sel_comp.data('comp') == 'Tous') {
+		$('a[data-comp]').children("img").attr("style","opacity:0.4");
+		$('a[data-comp="Tous"]').removeAttr("class");
+	}
+	else {
+		for (var i=0; i<sel_comp.length; i++) {
+			selected.push(~~sel_comp[i].getAttribute('data-comp'));
+		}
+	}
+	var formule = $('a[data-formule][class="sel"]').data('formule');
+	var metier = $('a[data-metier][class="sel"]').data('metier');
+	var cat = $('a[data-category][class="sel"]').data('category');
+	var diff= $('a[data-difficulty][class="sel"]').data('difficulty');
+	var comp = $(this).data('comp');
+
+	if (selected.includes(comp)) {
+		$(this).removeAttr("class");
+		$(this).children("img").attr("style","opacity:0.4");
+		selected = selected.splice(selected.indexOf(comp),1);
+		if (selected.length==1) {
+			$('a[data-comp]').removeAttr("class");
+			$('a[data-comp="Tous"]').attr("class", "sel");
+			$('a[data-comp]').children("img").removeAttr("style");
+			comp = 'Tous';
+		}
+		else {
+			comp = selected;
+		}
+	}
+	else {
+		$(this).attr("class", "sel");
+		$(this).children("img").removeAttr("style");
+		selected.push(comp);
+		if (selected.length+2==$('a[data-comp]').length) {
+			$('a[data-comp]').removeAttr("class");
+			$('a[data-comp="Tous"]').attr("class", "sel");
+			$('a[data-comp]').children("img").removeAttr("style");
+			comp = 'Tous';
+		}
+		else {
+			comp = selected;
+		}
+	}
 	applyFiltering(formule,metier,cat,diff,comp);
 	return false;
 }
 
-function applyFiltering(formule,metier,cat,diff,comp) {
 
-	console.log(formule);
-	console.log(metier);
-	console.log(cat);
-	console.log(diff);
-	console.log(comp);
 
+function applyFiltering() {//formule,metier,cat,diff,comp) {
+	var formule = $('a[data-formule][class="sel"]').data('formule');
+	var metier = $('a[data-metier][class="sel"]').data('metier');
+	var cat = $('a[data-category][class="sel"]').data('category');
+	var diff = $('a[data-difficulty][class="sel"]').data('difficulty');
 
 	$('tr[data-formule]').show();
 	if (formule != 'Connues') {
@@ -354,13 +498,37 @@ function applyFiltering(formule,metier,cat,diff,comp) {
 			return $(this).text() !== diff+'%';
 		}).parent('[data-formule]').hide();
 	}
-	if (comp != 'Tous') {
-		$('td:last-child').not(':has([src*="items/'+comp+'.gif"])').parent('[data-formule]').hide();
-	}
+
 	$('tr[data-metier=fixe]').show();
 	updateTableTitle()
 }
 
+function filterComponents(comp) {
+	applyFiltering();
+	if (comp != 'Tous') {
+		if (typeof(comp)=='number') {
+			$('td:last-child').not(':has([src*="items/'+comp+'.gif"])').parent('[data-formule]').hide();
+		}
+		else {
+			let lines = $('tr[data-formule]:visible');
+			for (var l=0; l<lines.length; l++) {
+				let icons = lines.eq(l).children('td:last-child').children('img[src]');
+				let count = 0;
+				for (var c=0; c<comp.length; c++) {
+					for (var i=0; i<icons.length; i++) {
+						if(icons[i].src.includes('/'+comp[c]+'.gif')) {
+							count += 1;
+						}
+					}
+				}
+				if (count!=comp.length) {
+					lines.eq(l).attr('hidden','true');
+				}
+			}
+		}
+	}
+	updateTableTitle()
+}
 
 
 function updatePageAttributes() {
@@ -446,14 +614,15 @@ function addDifficultyFilter() {
 	let extra = document.createElement("div");
 	extra.setAttribute('class',"filtres");
 	extra.setAttribute('style',"text-align:center;");
-
 	extra.innerHTML = '<blockquote class="bloc"><strong>Difficulté</strong><br><a href="#" data-difficulty="Tous">Toutes</a> '
 		+ '<span><img src="images/interface/puce_small.gif" alt=""> <a href="#" data-difficulty="0">0%</a> </span> '
 		+ '<span><img src="images/interface/puce_small.gif" alt=""> <a href="#" data-difficulty="20">20%</a> </span> '
 		+ '<span><img src="images/interface/puce_small.gif" alt=""> <a href="#" data-difficulty="40">40%</a> </span> '
 		+ '</blockquote>';
-
 	bloc.insertBefore(extra,table);
+
+	let br = document.createElement("br");
+	bloc.insertBefore(br,table);
 
 	$('a[data-difficulty]').click(selectDifficultyFilter);
 	$('a[data-difficulty="Tous"]').attr("class", "sel"); // default selected
@@ -486,6 +655,28 @@ function addComponentFilter() {
 	$('a[data-comp="Tous"]').attr("class", "sel"); // comp Tous
 }
 
+function addSearchBar() {
+
+	let div = document.createElement("div");
+	div.setAttribute('style',"text-align:center;");
+	div.innerHTML += '<input id="search" type="text">';
+
+	let bloc = document.getElementById("bloc");
+	let table = bloc.getElementsByTagName("table")[0];
+	bloc.insertBefore(div,table);
+	$('#search').change(searchText);
+
+}
+
+
+function searchText() {
+	let tex = $('#search')[0].value ;
+	applyFiltering();
+	console.log(tex);
+	$('tr[data-formule]:visible:not(:contains("'+tex+'"))').hide();
+	updateTableTitle()
+
+}
 
 
 function updateComponentFilter() {
@@ -569,7 +760,7 @@ function findMules() {
 function saveInventory(inv) {
 	var i, lines, cell, table;
 	lines = document.getElementsByTagName('table')[0].getElementsByClassName("item");
-	// console.log(lines.length)
+	console.log($("h3")[0].innerText )
 	table = "";
 	for (i=0;i<lines.length;i++){
 		if(lines[i].parentNode.tagName == "TD") {
@@ -582,22 +773,22 @@ function saveInventory(inv) {
 	localStorage.setItem(inv,table);
 	let ts = (new Date()).getTime();
 	localStorage.setItem(inv+'_ts',ts);
-	// console.log(ts);
+	console.log("Saved "+ inv);
 }
 
-function saveMulet(mule) {
+function saveMulet(mule,w) {
 	var i, lines, cell, table, inv;
-	lines = document.getElementsByTagName('table')[0].getElementsByClassName("item");
-	// console.log(lines.length)
+	lines = w.document.getElementsByTagName('table')[0].getElementsByClassName("item");
+	console.log($("h3")[0].innerText )
 	table = "";
 	for (i=0;i<lines.length;i++){
 		if(lines[i].parentNode.tagName == "TD") {
-			
+
 			let icon = lines[i].src.split('items/')[1].split('.gif')[0];
 			if (id_equip.includes(~~icon)) inv = "Equipement";
 			if (id_conso.includes(~~icon)) inv = "Consommable";
 			if (id_resso.includes(~~icon)) inv = "Ressource";
-			
+
 			table += "<tr data-inv='" + inv + "'>";
 			cell = lines[i].parentNode.outerHTML;
 			table += cell;
@@ -607,7 +798,7 @@ function saveMulet(mule) {
 	localStorage.setItem(mule,table);
 	let ts = (new Date()).getTime();
 	localStorage.setItem(mule+'_ts',ts);
-	// console.log(ts);
+	console.log("Saved mulet "+ mule);
 }
 
 
@@ -627,7 +818,7 @@ function mergeInventory() {
 	if(localStorage.getItem("show_eq")==1) inv_to_show.push("Equipement");
 	if(localStorage.getItem("show_co")==1) inv_to_show.push("Consommable");
 	if(localStorage.getItem("show_re")==1) inv_to_show.push("Ressource");
-	// console.log(inv_to_show);
+	console.log(inv_to_show);
 	// let mule_to_show = [];
 	// if(localStorage.getItem("show_eq")==1) mule_to_show.push("Equipement");
 	// if(localStorage.getItem("show_co")==1) mule_to_show.push("Consommable");
@@ -731,23 +922,48 @@ function createInventory() {
 		myhtml += '</td></tr>';
 	}
 	myhtml += '</tbody></table><input name="refresh_inv" type="submit" value="Modifier" form="form_inv"></form><br><br>';
-	
-	// -------------------------------------------------------------------
-	
-	let extra = document.createElement("div");
-	extra.setAttribute('class',"filtres");
-	extra.setAttribute('hidden',"true");
-	extra.setAttribute('style',"text-align:center;");
 
-	extra.innerHTML = '<blockquote class="bloc"><strong>Catégories</strong><br><a href="#" data-inv="Tous">Tout</a> '
+	// -------------------------------------------------------------------
+
+	let category_selector = document.createElement("div");
+	category_selector.setAttribute('class',"filtres");
+	// category_selector.setAttribute('hidden',"true");
+	category_selector.setAttribute('style',"text-align:center;");
+
+	category_selector.innerHTML = '<blockquote class="bloc"><strong>Catégories</strong><br><a href="#" data-inv="Tous">Tout</a> '
 		+ '<span><img src="images/interface/puce_small.gif" alt=""> <img src="images/items/74.gif" class="item"><a href="#" data-inv="Equipement">Équipements</a> </span> '
 		+ '<span><img src="images/interface/puce_small.gif" alt=""> <img src="images/items/3.gif" class="item"><a href="#" data-inv="Consommable">Consommables</a> </span> '
 		+ '<span><img src="images/interface/puce_small.gif" alt=""> <img src="images/items/5.gif" class="item"><a href="#" data-inv="Ressource">Ressources</a> </span> '
 		+ '</blockquote>';
-	myhtml += extra.outerHTML;
-	
+	myhtml += category_selector.outerHTML;
+
 	// -------------------------------------------------------------------
-	
+
+	if(mules_id.length>0){
+
+		let mule_selector = document.createElement("div");
+		mule_selector.setAttribute('class',"filtres");
+		// mule_selector.setAttribute('hidden',"true");
+		mule_selector.setAttribute('style',"text-align:center;");
+
+		mulesHTML = '<blockquote class="bloc"><strong>Mulets</strong><br><a href="#" data-mule="Tous">Tous</a> ';
+		mulesHTML += '<span><img src="images/interface/puce_small.gif" alt=""> <a href="#" data-mule="Aucun">Aucun</a> ';
+
+		for(i=0; i<mules_id.length; i++) {
+			let name = mules_name[i];
+			let mule_ts = localStorage.getItem(mules_id[i]+"_ts");
+			let ts = null;
+			if(mule_ts) ts = (new Date()).getTime() - mule_ts;
+			mulesHTML += '<span><img src="images/interface/puce_small.gif" alt=""> '
+									+ '<img src="images/vue/monstre/37.gif" class="item">&nbsp;'
+									+ '<a href="#" data-mule="' +  mules_id[i] + '">' + name + ' (' + formatTime(ts) + ')</a> </span> '
+		}
+		mulesHTML += '</blockquote>';
+		mule_selector.innerHTML = mulesHTML;
+		myhtml += mule_selector.outerHTML;
+	}
+	// -------------------------------------------------------------------
+
 	let table = mergeInventory();
 	myhtml += table;
 
