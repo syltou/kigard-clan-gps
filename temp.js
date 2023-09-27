@@ -35,7 +35,7 @@ if (typeof GM_addStyle == 'undefined') {
 // }
 
 
-
+var test = '';
 var components = [];
 var components_alt = [];
 var members = [];
@@ -143,13 +143,13 @@ if (page == 'vue') {
 }
 
 if (page == 'InventaireComplet' && inv=='update') {
-	// updateInventory();
-	console.log('avant')
-    let test = $.get('index.php?p=inventaire&genre=Equipement', null, function(text){
-		 let test = $(text).find("h3");
-		 return test;
-    });
-	console.log(test)
+	updateInventory();
+	// console.log('avant')
+    // let test = $.get('index.php?p=inventaire&genre=Equipement', null, function(text){
+		 // let test = $(text).find("h3");
+		 // return test;
+    // });
+	// console.log(test)
 
     // open('index.php?p=inventaire&genre=Consommable','_self');
     // open('index.php?p=inventaire&genre=Ressource','_self');
@@ -263,38 +263,32 @@ function updateOriginalFilters() {
 }
 
 function updateInventory() {
-	let w=window.open("https://tournoi.kigard.fr/index.php?p=inventaire&genre=Equipement",'_self');
-	$( w.document ).ready( function () {
-		saveInventory('Equipement');
-		console.log( "Equipement updated!" );
+
+	open("https://tournoi.kigard.fr/index.php?p=inventaire&genre=Equipement",'_self');
+	$( document ).ready( function () {
+		saveInventory2();
 	});
-	// });
-	// w.close();
+	
+	
 
-	window.open("https://tournoi.kigard.fr/index.php?p=inventaire&genre=Consommable",'_self');
+	// open("https://tournoi.kigard.fr/index.php?p=inventaire&genre=Consommable",'_self');
+	// $( document ).ready(function() {
+		// saveInventory('Consommable');
+		// console.log( "Consommable updated!" );
+	// });
+
+	// window.open("https://tournoi.kigard.fr/index.php?p=inventaire&genre=Ressource",'_self');
+	// $( document ).ready(function() {
+		// saveInventory('Ressource');
+		// console.log( "Ressource updated!" );
+	// });
+
+	// window.open("https://tournoi.kigard.fr/index.php?p=empathie",'_self');
 	// // w.resizeTo(0,0);
 	// // w.moveTo(0,w.screen.availHeight+10);
 	// $( w.document ).ready(function() {
-	saveInventory('Consommable');
-	console.log( "Consommable updated!" );
-	// });
-	// w.close();
-
-	window.open("https://tournoi.kigard.fr/index.php?p=inventaire&genre=Ressource",'_self');
-	// // w.resizeTo(0,0);
-	// // w.moveTo(0,w.screen.availHeight+10);
-	// $( w.document ).ready(function() {
-	saveInventory('Ressource');
-	console.log( "Ressource updated!" );
-	// });
-	// w.close();
-
-	window.open("https://tournoi.kigard.fr/index.php?p=empathie",'_self');
-	// // w.resizeTo(0,0);
-	// // w.moveTo(0,w.screen.availHeight+10);
-	// $( w.document ).ready(function() {
-	findMules();
-	console.log( "Mules found!" );
+	// findMules();
+	// console.log( "Mules found!" );
 	// });
 	// w.close();
 
@@ -844,22 +838,9 @@ function saveInventory(inv) {
 	console.log("Saved "+ inv);
 }
 
-function saveInventory2(html,inv) {
-	var i, lines, cell, table;
-	lines = $( html ).find('table')[0].getElementsByClassName("item");
-	table = "";
-	for (i=0;i<lines.length;i++){
-		if(lines[i].parentNode.tagName == "TD") {
-			table += "<tr data-inv='" + inv + "'>";
-			cell = lines[i].parentNode.outerHTML;
-			table += cell;
-			table += "</tr>";
-		}
-	}
-	localStorage.setItem(inv,table);
-	let ts = (new Date()).getTime();
-	localStorage.setItem(inv+'_ts',ts);
-	console.log("Saved "+ inv);
+function saveInventory2() {
+	test = $("tr").find("td:nth(1)");
+	console.log(test[0].textContent);
 }
 
 function saveMulet(mule) {
