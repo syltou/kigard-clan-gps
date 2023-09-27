@@ -109,7 +109,7 @@ if(page == "formules") {
 
 
 if (page == "inventaire" && (inv == "Equipement" || inv == "Consommable" || inv == "Ressource")) {
-    console.log("Start saveInventory "+inv);
+    console.log("Save inventory "+inv);
 	saveInventory(inv);
 	let bloc = document.getElementById("bloc");
 	addCopyButton(bloc.getElementsByTagName("table")[0],"inventory");
@@ -142,26 +142,23 @@ if (page == 'vue') {
 
 }
 
-if (page == 'InventaireComplet') {
+if (page == 'InventaireComplet' && inv=='update') {
 	// updateInventory();
-    let w = open("https://tournoi.kigard.fr/index.php?p=inventaire&genre=Equipement");
-    $( w.document ).ready( function () {
-        console.log("TOTO");
+	console.log('avant')
+    let test = $.get('index.php?p=inventaire&genre=Equipement', null, function(text){
+		 let test = $(text).find("h3");
+		 return test;
     });
-    w.close();
-    w = window.open("https://tournoi.kigard.fr/index.php?p=inventaire&genre=Consommable");
-    $( w.document ).ready( function () {
-        console.log("TOTO");
-    });
-    w.close();
+	console.log(test)
 
-    w = window.open("https://tournoi.kigard.fr/index.php?p=inventaire&genre=Ressource");
-    $( w.document ).ready( function () {
-        console.log("TOTO");
-    });
-    w.close();
-	createInventory();
+    // open('index.php?p=inventaire&genre=Consommable','_self');
+    // open('index.php?p=inventaire&genre=Ressource','_self');
+    open('index.php?p=InventaireComplet&Equipement=on&Consommable=on&Ressource=on&9294=on','_self')
+}
 
+if (page == 'InventaireComplet' && inv!='update') {
+    console.log('create inventory');
+    createInventory();
 }
 
 changeMenu();
@@ -830,12 +827,26 @@ function findMules() {
 }
 
 function saveInventory(inv) {
-    $( this.document ).ready(function () {
-        console.log("Ready!");
-    });
 	var i, lines, cell, table;
 	lines = document.getElementsByTagName('table')[0].getElementsByClassName("item");
-	console.log($("h3")[0].innerText )
+	table = "";
+	for (i=0;i<lines.length;i++){
+		if(lines[i].parentNode.tagName == "TD") {
+			table += "<tr data-inv='" + inv + "'>";
+			cell = lines[i].parentNode.outerHTML;
+			table += cell;
+			table += "</tr>";
+		}
+	}
+	localStorage.setItem(inv,table);
+	let ts = (new Date()).getTime();
+	localStorage.setItem(inv+'_ts',ts);
+	console.log("Saved "+ inv);
+}
+
+function saveInventory2(html,inv) {
+	var i, lines, cell, table;
+	lines = $( html ).find('table')[0].getElementsByClassName("item");
 	table = "";
 	for (i=0;i<lines.length;i++){
 		if(lines[i].parentNode.tagName == "TD") {
@@ -1067,7 +1078,10 @@ function addCopyButton(table,type) {
 	button.value = "Copier la liste";
 
 	let space = document.createTextNode('&nbsp;')
- 
+
+    let filter1, filter2, filter3, filter4, filter5;
+    let label1, label2, label3, label4, label5;
+
 
 
 	switch(type) {
@@ -1081,37 +1095,42 @@ function addCopyButton(table,type) {
 
 		  case 'formulas':
 
-			let filter1 = document.createElement("input");
+			filter1 = document.createElement("input");
 			filter1.id = "show_formule";
 			filter1.type = "checkbox";
-			let label1 = document.createElement("label");
+			label1 = document.createElement("label");
 			label1.setAttribute('for',"show_formule");
 			label1.innerHTML = "Formules";
-			let filter2 = document.createElement("input");
+
+            filter2 = document.createElement("input");
 			filter2.id = "show_caracs";
 			filter2.type = "checkbox";
-			let label2 = document.createElement("label");
+			label2 = document.createElement("label");
 			label2.setAttribute('for',"show_caracs");
 			label2.innerHTML = "Caracs";
-			let filter3 = document.createElement("input");
+
+            filter3 = document.createElement("input");
 			filter3.id = "show_diff";
 			filter3.type = "checkbox";
-			let label3 = document.createElement("label");
+			label3 = document.createElement("label");
 			label3.setAttribute('for',"show_diff");
 			label3.innerHTML = "Difficulté";
-			let filter4 = document.createElement("input");
+
+            filter4 = document.createElement("input");
 			filter4.id = "show_metier";
 			filter4.type = "checkbox";
-			let label4 = document.createElement("label");
+			label4 = document.createElement("label");
 			label4.setAttribute('for',"show_metier");
 			label4.innerHTML = "Métier";
-			let filter5 = document.createElement("input");
+
+            filter5 = document.createElement("input");
 			filter5.id = "show_bonus";
 			filter5.type = "checkbox";
-			let label5 = document.createElement("label");
+			label5 = document.createElement("label");
 			label5.setAttribute('for',"show_bonus");
 			label5.innerHTML = "Bonus";
-			span.appendChild(button);
+
+            span.appendChild(button);
 			span.appendChild( document.createTextNode( '\u00A0\u00A0' ) );
 			span.appendChild(filter1);
 			span.appendChild( document.createTextNode( '\u00A0' ) );
@@ -1134,7 +1153,6 @@ function addCopyButton(table,type) {
 			span.appendChild(label5);
 			$("#copy_list").click(copyListFormulas);
 			break;
-
 
 		  default:
 
@@ -1331,7 +1349,7 @@ function changeMenu() {
 				if(name=="Mulet") name += " " + mules_id[j];
 				temp += '<li><a href="index.php?p=gestion_stock&id_monstre=' + mules_id[j] + '"><img src="images/vue/monstre/37.gif" alt="Mulet" title="Mulet" class="elements" vertical-align="middle">&nbsp;' + name + '</a></li>';
 			}
-			temp += '<li><a href="index.php?p=InventaireComplet' + urlTout + '">Tout</a></li>' + list[0].innerHTML.slice(-5);
+			temp += '<li><a href="index.php?p=InventaireComplet&genre=update' + urlTout + '">Tout</a></li>' + list[0].innerHTML.slice(-5);
 			list[0].innerHTML = temp
 			// console.log(list[0]);
 		}
