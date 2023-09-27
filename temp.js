@@ -28,11 +28,11 @@ if (typeof GM_addStyle == 'undefined') {
 }
 
 
-if(window.location == "https://tournoi.kigard.fr/liste_pj.php") {
+// if(window.location == "https://tournoi.kigard.fr/liste_pj.php") {
 
-    testListePJ();
-    return;
-}
+//     testListePJ();
+//     return;
+// }
 
 
 
@@ -74,9 +74,9 @@ var id_left = [37,50,88,94,99,120,128,130,132,133,134,135,139,158,169,170,201,20
 			  325,332,345,346,347,348,349,351,352,353,354,355,356,357,358,359,360,
 			  361,362,363,364,365,366,367,368,369,370];
 
-if(localStorage.getItem("show_eq")==null) localStorage.setItem("show_eq",1);
-if(localStorage.getItem("show_co")==null) localStorage.setItem("show_co",1);
-if(localStorage.getItem("show_re")==null) localStorage.setItem("show_re",1);
+// if(localStorage.getItem("show_eq")==null) localStorage.setItem("show_eq",1);
+// if(localStorage.getItem("show_co")==null) localStorage.setItem("show_co",1);
+// if(localStorage.getItem("show_re")==null) localStorage.setItem("show_re",1);
 
 
 let top = document.getElementsByClassName("margin_position");
@@ -94,7 +94,7 @@ if (page == "options") {
 }
 
 if (page == "empathie") {
-
+    findMules();
 	addButtonEmpathie();
 }
 
@@ -109,6 +109,7 @@ if(page == "formules") {
 
 
 if (page == "inventaire" && (inv == "Equipement" || inv == "Consommable" || inv == "Ressource")) {
+    console.log("Start saveInventory "+inv);
 	saveInventory(inv);
 	let bloc = document.getElementById("bloc");
 	addCopyButton(bloc.getElementsByTagName("table")[0],"inventory");
@@ -142,7 +143,23 @@ if (page == 'vue') {
 }
 
 if (page == 'InventaireComplet') {
-	updateInventory();
+	// updateInventory();
+    let w = open("https://tournoi.kigard.fr/index.php?p=inventaire&genre=Equipement");
+    $( w.document ).ready( function () {
+        console.log("TOTO");
+    });
+    w.close();
+    w = window.open("https://tournoi.kigard.fr/index.php?p=inventaire&genre=Consommable");
+    $( w.document ).ready( function () {
+        console.log("TOTO");
+    });
+    w.close();
+
+    w = window.open("https://tournoi.kigard.fr/index.php?p=inventaire&genre=Ressource");
+    $( w.document ).ready( function () {
+        console.log("TOTO");
+    });
+    w.close();
 	createInventory();
 
 }
@@ -249,9 +266,11 @@ function updateOriginalFilters() {
 }
 
 function updateInventory() {
-	window.open("https://tournoi.kigard.fr/index.php?p=inventaire&genre=Equipement",'_self');
-	saveInventory('Equipement');
-	console.log( "Equipement updated!" );
+	let w=window.open("https://tournoi.kigard.fr/index.php?p=inventaire&genre=Equipement",'_self');
+	$( w.document ).ready( function () {
+		saveInventory('Equipement');
+		console.log( "Equipement updated!" );
+	});
 	// });
 	// w.close();
 
@@ -479,7 +498,7 @@ function applyFiltering() {//formule,metier,cat,diff,comp) {
 	var metier = $('a[data-metier][class="sel"]').data('metier');
 	var cat = $('a[data-category][class="sel"]').data('category');
 	var diff = $('a[data-difficulty][class="sel"]').data('difficulty');
-	
+
 	console.log("HALLO");
 
 	$('tr[data-formule]').show();
@@ -619,7 +638,7 @@ function addDifficultyFilter() {
 		+ '<span><img src="images/interface/puce_small.gif" alt=""> <a href="#" data-difficulty="20">20%</a> </span> '
 		+ '<span><img src="images/interface/puce_small.gif" alt=""> <a href="#" data-difficulty="40">40%</a> </span> '
 		+ '</blockquote>';
-		
+
 	bloc.insertBefore(extra,table);
 	bloc.insertBefore(document.createElement("br"),table);
 
@@ -630,19 +649,19 @@ function addDifficultyFilter() {
 
 
 function addExtraFilters() {
-	
+
 	let div = document.createElement("div");
     div.setAttribute('style',"text-align:center;");
 	div.setAttribute('class',"filtres");
 	let bkq = document.createElement("blockquote");
     bkq.setAttribute('id',"extra-filters");
 	bkq.setAttribute('class',"bloc");
-	
+
 	let t = document.createElement("strong");
 	t.appendChild(document.createTextNode("Filtrer par ingrédient"));
 	bkq.appendChild( t );
 	bkq.appendChild(addComponentFilter());
-	
+
 	t = document.createElement("strong");
 	let tt = document.createElement("span");
 	tt.setAttribute('style',"font-size: 1.2em; font-weight: bold; color: red ");
@@ -679,7 +698,7 @@ function addComponentFilter() {
 	all_comp.setAttribute('hidden','true');
 	div.appendChild(all_comp);
 	// = '<a href="#" data-comp="Tous" hidden=true></a>';
-	
+
 	for(var i=0;i<components.length;i++) {
 		let comp = document.createElement("a");
 		comp.href = "#";
@@ -691,11 +710,11 @@ function addComponentFilter() {
 		let span = document.createElement("span");
 		span.appendChild(comp);
 		div.appendChild(span);
-		
+
 		// list_comp += '<span><a href="#" data-comp="' + components[i].split('.')[0] + '"><img src="images/items/' + components[i] + '" title="' + components_alt[i] + '"> </a></span>';
 	}
 	// div.innerHTML = list_comp;
-	
+
 	// let bloc = document.getElementById("bloc");
 	// let table = bloc.getElementsByTagName("table")[0];
 	// bloc.insertBefore( document.createElement("br") ,table);
@@ -704,7 +723,7 @@ function addComponentFilter() {
 	$(div).find('a[data-comp]').click(selectComponentFilter);
 	// set default filters
 	$(div).find('a[data-comp="Tous"]').attr("class", "sel"); // comp Tous
-	
+
 	return div;
 }
 
@@ -714,9 +733,9 @@ function addSearchBar() {
 	div.setAttribute('style',"text-align:center;");
 	//<label form="search"><b>OU</b> par chaînes de caractères &nbsp;&nbsp;</label>
 	div.innerHTML += '<input id="search" type="text">';
-	
+
 	$(div).find('#search').change(searchText);
-	
+
 	return div;
 
 }
@@ -811,6 +830,9 @@ function findMules() {
 }
 
 function saveInventory(inv) {
+    $( this.document ).ready(function () {
+        console.log("Ready!");
+    });
 	var i, lines, cell, table;
 	lines = document.getElementsByTagName('table')[0].getElementsByClassName("item");
 	console.log($("h3")[0].innerText )
@@ -829,9 +851,9 @@ function saveInventory(inv) {
 	console.log("Saved "+ inv);
 }
 
-function saveMulet(mule,w) {
+function saveMulet(mule) {
 	var i, lines, cell, table, inv;
-	lines = w.document.getElementsByTagName('table')[0].getElementsByClassName("item");
+	lines = document.getElementsByTagName('table')[0].getElementsByClassName("item");
 	console.log($("h3")[0].innerText )
 	table = "";
 	for (i=0;i<lines.length;i++){
@@ -1037,7 +1059,7 @@ function addCopyButton(table,type) {
 	let parent = table.parentNode;
 	let span = document.createElement("span");
 	parent.insertBefore(span,table);
-	
+
 	// let button2 = '<input name="copy_list" type="button" value="Copier la liste">';
 	let button = document.createElement("input");//, { name: "copy_list"; type: "button"; value: "Copier la liste" });
 	button.id = "copy_list";
@@ -1045,19 +1067,20 @@ function addCopyButton(table,type) {
 	button.value = "Copier la liste";
 
 	let space = document.createTextNode('&nbsp;')
-	
+ 
+
 
 	switch(type) {
-		
+
 		  case 'inventory':
-		  
+
 			span.appendChild(button);
 			$("#copy_list").click(copyListInventory);
 			break;
-			
-			
+
+
 		  case 'formulas':
-		  
+
 			let filter1 = document.createElement("input");
 			filter1.id = "show_formule";
 			filter1.type = "checkbox";
@@ -1111,10 +1134,10 @@ function addCopyButton(table,type) {
 			span.appendChild(label5);
 			$("#copy_list").click(copyListFormulas);
 			break;
-			
-			
+
+
 		  default:
-		  
+
 	}
 }
 
@@ -1126,7 +1149,7 @@ function copyListInventory() {
 function copyListFormulas() {
 
 	var i, j , m, p;
-	
+
 	var formule = $('a[data-formule][class="sel"]').data('formule');
 	var metier = $('a[data-metier][class="sel"]').data('metier');
 	var cat = $('a[data-category][class="sel"]').data('category');
@@ -1134,13 +1157,13 @@ function copyListFormulas() {
 	var comp = $('a[data-comp][class="sel"]').data('comp');
 	var comp_name = $('a[data-comp][class="sel"]').children("img").attr("title");
 	var search = $('#search')[0].value ;
-	
+
 	let show_formule = $("#show_formule")[0].checked;
 	let show_caracs = $("#show_caracs")[0].checked;
 	let show_diff = $("#show_diff")[0].checked;
 	let show_metier = $("#show_metier")[0].checked;
 	let show_bonus = $("#show_bonus")[0].checked;
-	
+
 
 	let category = ''
 	for ( i=0;i<cat.split('-').length;i++) {
@@ -1157,7 +1180,7 @@ function copyListFormulas() {
     if(diff != 'Tous') buffer += " de difficulté " + diff + "%";
     if(cat != 'Tous') buffer += " pour les éléments de type " + category.trim();
     if(comp != 'Tous') buffer += " contenant l'ingrédient " + comp_name.trim();
-	if(search) buffer += ' et dont la description contient "' + search + '"';
+	if(search) buffer += ' dont la description contient "' + search + '"';
     buffer += " :\n";
 
 	let liste = $("tr[data-formule]:visible");
@@ -1178,7 +1201,7 @@ function copyListFormulas() {
 			}
 			buffer += ") ";
 		}
-			
+
         // buffer += " (" + liste[i].getElementsByTagName("td")[1].innerText + "):";
         let components = liste[i].getElementsByTagName("td")[3].getElementsByTagName("img");
         let quantity = liste[i].getElementsByTagName("td")[3].innerText.split('x');
