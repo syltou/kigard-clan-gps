@@ -4,7 +4,7 @@
 // @contributor Ciol <ciolfire@gmail.com> (100% inspiré de Kigard Fashion Script)
 // @contributor
 // @description Un script facilitant la localisation des membres du clan
-// @version 0.8.2
+// @version 0.8.3
 // @grant GM_addStyle
 // @match https://tournoi.kigard.fr/*
 // @exclude
@@ -709,7 +709,7 @@ function createInventory() {
 	let bloc = document.getElementById("bloc");
 	bloc.innerHTML = myhtml;
 
-	addCopyButton(document.getElementById("inventaire_complet"));
+	addCopyButton(document.getElementById("inventaire_complet"),'inventory');
 
 }
 
@@ -738,7 +738,7 @@ function addCopyButton(table,type) {
 
 function copyListInventory() {
 
-	navigator.clipboard.writeText($("table:first").children("tbody:first").children("tr").find("strong").each(function(){$(this).text($(this).text()+'\n')}).text());
+	navigator.clipboard.writeText($("table:last").children("tbody:first").children("tr").find("strong").each(function(){$(this).text($(this).text()+'\n')}).text());
 }
 
 function copyListFormulas() {
