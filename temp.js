@@ -84,6 +84,18 @@ mypos = parsePosition(top[0].innerText.trim());
 let name = document.getElementsByTagName("strong");
 myname = name[0].innerText.trim();
 
+if (page == "exploration") {
+	
+	saveInventory2("index.php?p=inventaire&genre=Equipement");
+	
+}
+
+if (page == "nv_metier") {
+	var table = localStorage.getItem("mytest");
+	console.log(table);
+}
+	
+
 if (page == "options") {
 	if (urlParams.get('sm') == "portrait") {
 		let bloc = document.getElementById("bloc");
@@ -844,9 +856,17 @@ function saveInventory(inv) {
 	console.log("Saved "+ inv);
 }
 
-function saveInventory2(inv) {
-	test = $("tr").find("td:nth(1)");
-	console.log(test[0].textContent);
+function saveInventory2(url) {
+	window.open("index.php?p=inventaire&genre=Tenue",'_self');
+	if(confirm("Next page ?")==true){
+		window.open("index.php?p=inventaire&genre=Equipement",'_self');
+		if(confirm("Next page ?")==true){
+			window.open("index.php?p=inventaire&genre=Consommable",'_self');
+			if(confirm("Next page ?")==true){
+				window.open("index.php?p=inventaire&genre=Ressource",'_self');
+			}
+		}
+	}
 }
 
 function saveMulet(mule) {
@@ -880,21 +900,23 @@ function mergeInventory() {
 	let i, table, temp;
 	temp = localStorage.getItem("mules_id");
 	let mules_id = temp ? temp.split(',') : [];
-	temp = localStorage.getItem("mules_name");
-	let mules_name = temp ? temp.split(',') : [];
-	temp = localStorage.getItem("show_mules");
-	let mules_to_show = temp ? temp.split(',') : [];
+	// temp = localStorage.getItem("mules_name");
+	// let mules_name = temp ? temp.split(',') : [];
+	// temp = localStorage.getItem("show_mules");
+	// let mules_to_show = temp ? temp.split(',') : [];
 
-	// console.log(mules_to_show);
+	// // console.log(mules_to_show);
 
-	let inv_to_show = [];
-	if(localStorage.getItem("show_eq")==1) inv_to_show.push("Equipement");
-	if(localStorage.getItem("show_co")==1) inv_to_show.push("Consommable");
-	if(localStorage.getItem("show_re")==1) inv_to_show.push("Ressource");
-	console.log(inv_to_show);
-	// let mule_to_show = [];
-	// if(localStorage.getItem("show_eq")==1) mule_to_show.push("Equipement");
-	// if(localStorage.getItem("show_co")==1) mule_to_show.push("Consommable");
+	// let inv_to_show = [];
+	// if(localStorage.getItem("show_eq")==1) inv_to_show.push("Equipement");
+	// if(localStorage.getItem("show_co")==1) inv_to_show.push("Consommable");
+	// if(localStorage.getItem("show_re")==1) inv_to_show.push("Ressource");
+	// console.log(inv_to_show);
+	// // let mule_to_show = [];
+	// // if(localStorage.getItem("show_eq")==1) mule_to_show.push("Equipement");
+	// // if(localStorage.getItem("show_co")==1) mule_to_show.push("Consommable");
+	
+	let inv_to_show = ["Tenue","Equipement","Consommable","Ressource"];
 
 	let merged = '<table id="inventaire_complet" width="100%"><tbody>';
 	for(i=0; i<inv_to_show.length; i++){
@@ -906,8 +928,8 @@ function mergeInventory() {
 			merged += table;
 		}
 	}
-	for(i=0; i<mules_to_show.length; i++){
-		table = localStorage.getItem(mules_to_show[i]);
+	for(i=0; i<mules_id.length; i++){
+		table = localStorage.getItem(mules_id[i]);
 		let mule;
 		if(table==null){
 			if(mules_name[i]=="Mulet") mule=mules_id[i];
@@ -924,7 +946,7 @@ function mergeInventory() {
 }
 
 function createInventory() {
-	let state_eq, state_co, state_re, show_mules;
+	// let state_eq, state_co, state_re, show_mules;
 	let temp, i, t;
 
 	temp = localStorage.getItem("mules_id");
@@ -932,69 +954,70 @@ function createInventory() {
 	temp = localStorage.getItem("mules_name");
 	let mules_name = temp ? temp.split(',') : [];
 
-	// console.log(mules_id);
-	// console.log(mules_name);
+	// // console.log(mules_id);
+	// // console.log(mules_name);
 
-	if(urlParams.get('Equipement')=='on') {
-		localStorage.setItem("show_eq",1);
-		state_eq = 'checked="checked"';
-	}
-	else{
-		localStorage.setItem("show_eq",0);
-		state_eq = '';
-	}
-	if(urlParams.get('Consommable')=='on') {
-		localStorage.setItem("show_co",1);
-		state_co = 'checked="checked"';
-	}
-	else{
-		localStorage.setItem("show_co",0);
-		state_co = '';
-	}
-	if(urlParams.get('Ressource')=='on') {
-		localStorage.setItem("show_re",1);
-		state_re = 'checked="checked"';
-	}
-	else{
-		localStorage.setItem("show_re",0);
-		state_re = '';
-	}
+	// if(urlParams.get('Equipement')=='on') {
+		// localStorage.setItem("show_eq",1);
+		// state_eq = 'checked="checked"';
+	// }
+	// else{
+		// localStorage.setItem("show_eq",0);
+		// state_eq = '';
+	// }
+	// if(urlParams.get('Consommable')=='on') {
+		// localStorage.setItem("show_co",1);
+		// state_co = 'checked="checked"';
+	// }
+	// else{
+		// localStorage.setItem("show_co",0);
+		// state_co = '';
+	// }
+	// if(urlParams.get('Ressource')=='on') {
+		// localStorage.setItem("show_re",1);
+		// state_re = 'checked="checked"';
+	// }
+	// else{
+		// localStorage.setItem("show_re",0);
+		// state_re = '';
+	// }
 
+	let ts_te = (t=localStorage.getItem("Tenue_ts")) ? (new Date()).getTime() - t : null;
 	let ts_eq = (t=localStorage.getItem("Equipement_ts")) ? (new Date()).getTime() - t : null;
 	let ts_co = (t=localStorage.getItem("Consommable_ts")) ? (new Date()).getTime() - t : null;
 	let ts_re = (t=localStorage.getItem("Ressource_ts")) ? (new Date()).getTime() - t : null;
 
-	show_mules = [];
-	for(i=0;i<mules_id.length;i++) {
-		if(urlParams.get(mules_id[i])=='on') {
-			show_mules.push(mules_id[i]);
-		}
-	}
-	localStorage.setItem("show_mules",show_mules);
+	// show_mules = [];
+	// for(i=0;i<mules_id.length;i++) {
+		// if(urlParams.get(mules_id[i])=='on') {
+			// show_mules.push(mules_id[i]);
+		// }
+	// }
+	// localStorage.setItem("show_mules",show_mules);
 
-	let myhtml = "<h3>Inventaire complet (sauf tenue)</h3>"
-	+ '<form id="form_inv" method="get" formaction="index.php?p=InventaireComplet">'
-	+ '<table><tbody><tr><td><input type="hidden" name="p"  value="' + page + '"/><strong>Catégories : </strong>&nbsp;&nbsp;</td><td>'
-	+ '<input type="checkbox" name="Equipement" value="on" ' + state_eq + ' form="form_inv"/>&nbsp;Équipements (' + formatTime(ts_eq) + ')&nbsp;&nbsp;'
-	+ '<input type="checkbox" name="Consommable" value="on" ' + state_co + ' form="form_inv"/>&nbsp;Consommables (' + formatTime(ts_co) + ')&nbsp;&nbsp;'
-	+ '<input type="checkbox" name="Ressource" value="on" ' + state_re + ' form="form_inv"/>&nbsp;Ressources (' + formatTime(ts_re) + ')&nbsp;&nbsp;</td></tr>';
+	let myhtml = "<h3>Inventaire complet</h3>"
+	// + '<form id="form_inv" method="get" formaction="index.php?p=InventaireComplet">'
+	// + '<table><tbody><tr><td><input type="hidden" name="p"  value="' + page + '"/><strong>Catégories : </strong>&nbsp;&nbsp;</td><td>'
+	// + '<input type="checkbox" name="Equipement" value="on" ' + state_eq + ' form="form_inv"/>&nbsp;Équipements (' + formatTime(ts_eq) + ')&nbsp;&nbsp;'
+	// + '<input type="checkbox" name="Consommable" value="on" ' + state_co + ' form="form_inv"/>&nbsp;Consommables (' + formatTime(ts_co) + ')&nbsp;&nbsp;'
+	// + '<input type="checkbox" name="Ressource" value="on" ' + state_re + ' form="form_inv"/>&nbsp;Ressources (' + formatTime(ts_re) + ')&nbsp;&nbsp;</td></tr>';
 
-	if(mules_id.length>0){
-		myhtml += '<tr><td><strong>Mulets : </strong>&nbsp;&nbsp;</td><td>'
-		for(i=0; i<mules_id.length; i++) {
-			let name = mules_name[i];
-			let state_mule = '';
-			let mule_ts = localStorage.getItem(mules_id[i]+"_ts");
-			let ts = null;
-			if(mule_ts) ts = (new Date()).getTime() - mule_ts;
-			// console.log(ts);
-			if(name=="Mulet") name=mules_id[i];
-			if(show_mules.includes(mules_id[i])) state_mule = 'checked="checked"';
-			myhtml += '<input type="checkbox" name="' + mules_id[i] + '" value="on" ' + state_mule + ' form="form_inv"/>&nbsp;' + name + ' (' + formatTime(ts) + ')&nbsp;&nbsp;';
-		}
-		myhtml += '</td></tr>';
-	}
-	myhtml += '</tbody></table><input name="refresh_inv" type="submit" value="Modifier" form="form_inv"></form><br><br>';
+	// if(mules_id.length>0){
+		// myhtml += '<tr><td><strong>Mulets : </strong>&nbsp;&nbsp;</td><td>'
+		// for(i=0; i<mules_id.length; i++) {
+			// let name = mules_name[i];
+			// let state_mule = '';
+			// let mule_ts = localStorage.getItem(mules_id[i]+"_ts");
+			// let ts = null;
+			// if(mule_ts) ts = (new Date()).getTime() - mule_ts;
+			// // console.log(ts);
+			// if(name=="Mulet") name=mules_id[i];
+			// if(show_mules.includes(mules_id[i])) state_mule = 'checked="checked"';
+			// myhtml += '<input type="checkbox" name="' + mules_id[i] + '" value="on" ' + state_mule + ' form="form_inv"/>&nbsp;' + name + ' (' + formatTime(ts) + ')&nbsp;&nbsp;';
+		// }
+		// myhtml += '</td></tr>';
+	// }
+	// myhtml += '</tbody></table><input name="refresh_inv" type="submit" value="Modifier" form="form_inv"></form><br><br>';
 
 	// -------------------------------------------------------------------
 
@@ -1004,10 +1027,10 @@ function createInventory() {
 	category_selector.setAttribute('style',"text-align:center;");
 
 	category_selector.innerHTML = '<blockquote class="bloc"><strong>Catégories</strong><br><a href="#" data-inv="Tous" style="font-weight: lighter; font-style: italic"><emph>Aucun</emph></a> '
-		+ '<span><img src="images/interface/puce_small.gif" alt=""> <img src="images/vue/pj/HumainF.gif" class="item"><a href="#" data-inv="Tenue" class="sel">Tenue</a> </span> '
-		+ '<span><img src="images/interface/puce_small.gif" alt=""> <img src="images/items/74.gif" class="item"><a href="#" data-inv="Equipement" class="sel">Équipements</a> </span> '
-		+ '<span><img src="images/interface/puce_small.gif" alt=""> <img src="images/items/3.gif" class="item"><a href="#" data-inv="Consommable" class="sel">Consommables</a> </span> '
-		+ '<span><img src="images/interface/puce_small.gif" alt=""> <img src="images/items/5.gif" class="item"><a href="#" data-inv="Ressource" class="sel">Ressources</a> </span> '
+		+ '<span><img src="images/interface/puce_small.gif" alt=""> <img src="images/vue/pj/HumainF.gif" class="item"><a href="#" data-inv="Tenue" class="sel">Tenue' + ' (' + formatTime(ts_te) + ') </a> </span> '
+		+ '<span><img src="images/interface/puce_small.gif" alt=""> <img src="images/items/74.gif" class="item"><a href="#" data-inv="Equipement" class="sel">Équipements' + ' (' + formatTime(ts_eq) + ') </a> </span> '
+		+ '<span><img src="images/interface/puce_small.gif" alt=""> <img src="images/items/3.gif" class="item"><a href="#" data-inv="Consommable" class="sel">Consommables' + ' (' + formatTime(ts_co) + ') </a> </span> '
+		+ '<span><img src="images/interface/puce_small.gif" alt=""> <img src="images/items/5.gif" class="item"><a href="#" data-inv="Ressource" class="sel">Ressources' + ' (' + formatTime(ts_re) + ') </a> </span> '
 		+ '</blockquote>';
 	myhtml += category_selector.outerHTML;
 
@@ -1020,7 +1043,8 @@ function createInventory() {
 		// mule_selector.setAttribute('hidden',"true");
 		mule_selector.setAttribute('style',"text-align:center;");
 
-		mulesHTML = '<blockquote class="bloc"><strong>Catégories</strong><br><a href="#" data-mule="Tous" style="font-weight: lighter; font-style: italic"><emph>Aucun</emph></a> '
+		mulesHTML = '<blockquote class="bloc"><strong>Emplacements</strong><br><a href="#" data-place="Tous" style="font-weight: lighter; font-style: italic"><emph>Aucun</emph></a> '
+			+ '<span><img src="images/interface/puce_small.gif" alt=""> <img src="images/items/169.gif" class="item"><a href="#" data-place="Inventaire" class="sel">Inventaire</a> </span> ';
 
 		for(i=0; i<mules_id.length; i++) {
 			let name = mules_name[i];
@@ -1029,7 +1053,7 @@ function createInventory() {
 			if(mule_ts) ts = (new Date()).getTime() - mule_ts;
 			mulesHTML += '<span><img src="images/interface/puce_small.gif" alt=""> '
 									+ '<img src="images/vue/monstre/37.gif" class="item">&nbsp;'
-									+ '<a href="#" data-mule="' +  mules_id[i] + '" class="sel">' + name + ' (' + formatTime(ts) + ')</a> </span> '
+									+ '<a href="#" data-place="' +  mules_id[i] + '" class="sel">' + name + ' (' + formatTime(ts) + ')</a> </span> '
 		}
 		mulesHTML += '</blockquote>';
 		mule_selector.innerHTML = mulesHTML;
@@ -1043,11 +1067,13 @@ function createInventory() {
 	let bloc = document.getElementById("bloc");
 	bloc.innerHTML = myhtml;
 
-	addCopyButton(document.getElementById("inventaire_complet"));
+	addCopyButton(document.getElementById("inventaire_complet"),'inventory');
 	
 	$('a[data-inv]').click(selectInventoryCategory);
-	$('a[data-mule]').click(selectInventoryMules);
+	$('a[data-place]').click(selectInventoryMules);
 	// $('a[data-inv="Tous"]').attr("class", "sel"); // default selected
+	
+	addGroupButton(document.getElementById("inventaire_complet"))
 
 }
 
@@ -1097,15 +1123,15 @@ function selectInventoryCategory() {
 
 function selectInventoryMules() {
 
-	if($(this).data('mule')=='Tous'){
+	if($(this).data('place')=='Tous'){
 		if($(this).text()=='Tous') {
-			$('a[data-mule]').attr('class','sel');
-			$('a[data-mule]').removeAttr('style');
+			$('a[data-place]').attr('class','sel');
+			$('a[data-place]').removeAttr('style');
 			$(this).text('Aucun');
 		}
 		else {
-			$('a[data-mule]').removeAttr('class');
-			$('a[data-mule]').attr("style","opacity:0.4");
+			$('a[data-place]').removeAttr('class');
+			$('a[data-place]').attr("style","opacity:0.4");
 			$(this).text('Tous');
 		}
 		
@@ -1122,14 +1148,14 @@ function selectInventoryMules() {
 		}
 	}
 			
-	$('a[data-mule="Tous"]').removeAttr('class');
-	$('a[data-mule="Tous"]').attr('style',"font-weight: lighter; font-style: italic");
+	$('a[data-place="Tous"]').removeAttr('class');
+	$('a[data-place="Tous"]').attr('style',"font-weight: lighter; font-style: italic");
 	
-	if($("a[data-mule][class=sel]").length>=$("a[data-mule]").length/2) {
-		$('a[data-mule="Tous"]').text("Aucun");
+	if($("a[data-place][class=sel]").length>=$("a[data-place]").length/2) {
+		$('a[data-place="Tous"]').text("Aucun");
 	}
 	else {
-		$('a[data-mule="Tous"]').text("Tous");
+		$('a[data-place="Tous"]').text("Tous");
 	}
 		
 	console.log($(this).attr('class'));
@@ -1143,8 +1169,8 @@ function selectInventoryMules() {
 function applyInventoryFilters() {
 	
 	let selected_mules = [];
-	$("a[data-mule][class=sel]").each(function () {  selected_mules.push($(this).data('mule')) });
-	selected_mules.push('Inventaire');
+	$("a[data-place][class=sel]").each(function () {  selected_mules.push($(this).data('place')) });
+	// selected_mules.push('Inventaire');
 	let selected_categ = [];
 	$("a[data-inv][class=sel]").each(function () {  selected_categ.push($(this).data('inv')) });
 	
@@ -1152,7 +1178,7 @@ function applyInventoryFilters() {
 	console.log(selected_mules);
 	
 	$("table:last").find("tr[data-inv][data-place]").hide();
-	// $("table:last").find("tr[data-inv=" + selected_categ + "][data-mule=" + selected_mules + "]").show();
+	// $("table:last").find("tr[data-inv=" + selected_categ + "][data-place=" + selected_mules + "]").show();
 	
 	$("table:last").find("tr[data-inv][data-place]").each( function () {
 		if( ($.inArray($(this).data('inv'), selected_categ) != -1) && ($.inArray($(this).data('place'), selected_mules) != -1) ) {
@@ -1161,6 +1187,56 @@ function applyInventoryFilters() {
 	});
 }
 
+function groupInventoryEntries() {
+	let list_entries = [];
+	var i;
+	
+	if ($("#group_entries").val() == "Grouper les entrées similaires") {
+		$("tr:visible > td > strong").each( function() {
+			if( (i = list_entries.indexOf($(this).text().trim())) > -1 ) {
+				// console.log($(this).text().trim() + ' already in list in position ' + i);
+				let name = $("tr:visible > td > strong").eq(i).text().trim().split(' x')[0];
+				let count = ~~$("tr:visible > td > strong").eq(i).text().trim().split(' x')[1];
+				if (count==0) count++;
+				$("tr:visible > td > strong").eq(i).text( name + ' x' + (count+1));
+				$("tr:visible > td > strong").eq(i).parent().parent().prop('grouped',true);
+				$(this).parent().parent().hide();
+				$(this).parent().parent().prop('grouped_hidden',true);
+				
+			}
+			else {
+				list_entries.push($(this).text().trim());
+				// console.log($(this).text().trim() + ' added');
+			}
+		});
+		$("#group_entries").val("Dégrouper les entrées similaires");
+	}
+	else {
+		$("tr[grouped=true] > td > strong").each( function() {
+			$(this).text( $(this).text().trim().split(' x')[0]);
+		});
+		$("tr[grouped_hidden=true]").show();
+		$("tr[grouped_hidden=true]").removeAttr('grouped_hidden');
+		$("#group_entries").val("Grouper les entrées similaires");
+	}
+}
+
+
+function addGroupButton(table) {
+
+	let parent = table.parentNode;
+	let span = document.createElement("span");
+	parent.insertBefore(span,table);
+
+	// let button2 = '<input name="copy_list" type="button" value="Copier la liste">';
+	let button = document.createElement("input");//, { name: "copy_list"; type: "button"; value: "Copier la liste" });
+	button.id = "group_entries";
+	button.type = "button";
+	button.value = "Grouper les entrées similaires";
+	
+	span.appendChild(button);
+	$("#group_entries").click(groupInventoryEntries);
+}
 
 function addCopyButton(table,type) {
 
@@ -1258,7 +1334,8 @@ function addCopyButton(table,type) {
 
 function copyListInventory() {
 
-	navigator.clipboard.writeText($("table:first").children("tbody:first").children("tr").find("strong").each(function(){$(this).text($(this).text()+'\n')}).text());
+	// navigator.clipboard.writeText($("table:first").children("tbody:first").children("tr:visible").find("strong").each(function(){$(this).text($(this).text()+'\n')}).text());
+	navigator.clipboard.writeText($("tr:visible > td > strong").each(function(){$(this).text($(this).text()+'\n')}).text());
 }
 
 function copyListFormulas() {
@@ -1314,13 +1391,14 @@ function copyListFormulas() {
 					if(m<metiers.length-1) buffer += '/';
 				}
 			}
-			buffer += ") ";
+			buffer += ")";
 		}
 
         // buffer += " (" + liste[i].getElementsByTagName("td")[1].innerText + "):";
         let components = liste[i].getElementsByTagName("td")[3].getElementsByTagName("img");
         let quantity = liste[i].getElementsByTagName("td")[3].innerText.split('x');
         if(show_formule) {
+			buffer += " :";
 			for (j=0;j<components.length;j++) {
 				buffer += " " + quantity[j] + "x " + components[j].alt;
 			}
