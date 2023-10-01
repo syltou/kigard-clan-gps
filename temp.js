@@ -1077,6 +1077,32 @@ function createInventory() {
 
 }
 
+
+function sortInventory() {
+	
+	let tbody = document.createElement("tbody");
+	tbody.id = "sorted_table";
+	tbody.innerHTML = "";
+	
+	let lines = $("table[id=inventaire_complet] > tbody > tr:visible").sort(function (a, b) {
+		return a.getElementsByTagName("strong")[0].innerText > b.getElementsByTagName("strong")[0].innerText;
+	});
+	
+	console.log(lines)
+	
+	for( var i=0; i<lines.length; i++) {
+		tbody.innerHTML += lines[i].outerHTML;
+	}
+	
+	console.log(tbody)
+	
+	
+	document.getElementById("inventaire_complet").getElementsByTagName("tbody")[0] = tbody;
+}
+	
+
+
+
 function selectInventoryCategory() {
 
 	if($(this).data('inv')=='Tous'){
@@ -1185,6 +1211,8 @@ function applyInventoryFilters() {
 			$(this).show();
 		}
 	});
+	
+	sortInventory();
 }
 
 function groupInventoryEntries() {
@@ -1199,9 +1227,9 @@ function groupInventoryEntries() {
 				let count = ~~$("tr:visible > td > strong").eq(i).text().trim().split(' x')[1];
 				if (count==0) count++;
 				$("tr:visible > td > strong").eq(i).text( name + ' x' + (count+1));
-				$("tr:visible > td > strong").eq(i).parent().parent().prop('grouped',true);
+				$("tr:visible > td > strong").eq(i).parent().parent().attr('grouped',true);
 				$(this).parent().parent().hide();
-				$(this).parent().parent().prop('grouped_hidden',true);
+				$(this).parent().parent().attr('grouped_hidden',true);
 				
 			}
 			else {
@@ -1215,6 +1243,7 @@ function groupInventoryEntries() {
 		$("tr[grouped=true] > td > strong").each( function() {
 			$(this).text( $(this).text().trim().split(' x')[0]);
 		});
+		$("tr[grouped=true]").removeAttr('grouped');
 		$("tr[grouped_hidden=true]").show();
 		$("tr[grouped_hidden=true]").removeAttr('grouped_hidden');
 		$("#group_entries").val("Grouper les entrées similaires");
