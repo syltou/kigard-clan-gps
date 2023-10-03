@@ -1212,7 +1212,17 @@ function applyInventoryFilters() {
 		}
 	});
 	
-	sortInventory();
+	// sortInventory();
+	ungroupInventoryEntries();
+}
+
+function toggleInventoryGrouping() {
+	if ($("#group_entries").val() == "Grouper les entrées similaires") {
+		groupInventoryEntries();
+	}
+	else {
+		ungroupInventoryEntries();
+	}
 }
 
 function groupInventoryEntries() {
@@ -1220,26 +1230,29 @@ function groupInventoryEntries() {
 	var i;
 	
 	if ($("#group_entries").val() == "Grouper les entrées similaires") {
-		$("tr:visible > td > strong").each( function() {
+		$("tr:visible > td > strong:nth-child(2)").each( function() {
 			if( (i = list_entries.indexOf($(this).text().trim())) > -1 ) {
-				// console.log($(this).text().trim() + ' already in list in position ' + i);
-				let name = $("tr:visible > td > strong").eq(i).text().trim().split(' x')[0];
-				let count = ~~$("tr:visible > td > strong").eq(i).text().trim().split(' x')[1];
+				console.log($(this).text().trim() + ' already in list in position ' + i);
+				let name = $("tr:visible > td > strong:nth-child(2)").eq(i).text().trim().split(' x')[0];
+				let count = ~~$("tr:visible > td > strong:nth-child(2)").eq(i).text().trim().split(' x')[1];
 				if (count==0) count++;
-				$("tr:visible > td > strong").eq(i).text( name + ' x' + (count+1));
-				$("tr:visible > td > strong").eq(i).parent().parent().attr('grouped',true);
+				$("tr:visible > td > strong:nth-child(2)").eq(i).text( name + ' x' + (count+1));
+				$("tr:visible > td > strong:nth-child(2)").eq(i).parent().parent().attr('grouped',true);
 				$(this).parent().parent().hide();
 				$(this).parent().parent().attr('grouped_hidden',true);
 				
 			}
 			else {
 				list_entries.push($(this).text().trim());
-				// console.log($(this).text().trim() + ' added');
+				console.log($(this).text().trim() + ' added');
 			}
 		});
 		$("#group_entries").val("Dégrouper les entrées similaires");
 	}
-	else {
+}
+
+function ungroupInventoryEntries() {
+	if ($("#group_entries").val() == "Dégrouper les entrées similaires")  {
 		$("tr[grouped=true] > td > strong").each( function() {
 			$(this).text( $(this).text().trim().split(' x')[0]);
 		});
@@ -1264,7 +1277,7 @@ function addGroupButton(table) {
 	button.value = "Grouper les entrées similaires";
 	
 	span.appendChild(button);
-	$("#group_entries").click(groupInventoryEntries);
+	$("#group_entries").click(toggleInventoryGrouping);
 }
 
 function addCopyButton(table,type) {
@@ -1280,23 +1293,17 @@ function addCopyButton(table,type) {
 	button.value = "Copier la liste";
 
 	let space = document.createTextNode('&nbsp;')
-
     let filter1, filter2, filter3, filter4, filter5;
     let label1, label2, label3, label4, label5;
-
-
 
 	switch(type) {
 
 		  case 'inventory':
-
 			span.appendChild(button);
 			$("#copy_list").click(copyListInventory);
 			break;
 
-
 		  case 'formulas':
-
 			filter1 = document.createElement("input");
 			filter1.id = "show_formule";
 			filter1.type = "checkbox";
@@ -1384,7 +1391,6 @@ function copyListFormulas() {
 	let show_diff = $("#show_diff")[0].checked;
 	let show_metier = $("#show_metier")[0].checked;
 	let show_bonus = $("#show_bonus")[0].checked;
-
 
 	let category = ''
 	for ( i=0;i<cat.split('-').length;i++) {
