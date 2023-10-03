@@ -1080,9 +1080,9 @@ function createInventory() {
 
 function sortInventory() {
 	
-	let tbody = document.createElement("tbody");
-	tbody.id = "sorted_table";
-	tbody.innerHTML = "";
+	let new_tbody = document.createElement("tbody");
+	new_tbody.id = "sorted_table";
+	new_tbody.innerHTML = "";
 	
 	let lines = $("table[id=inventaire_complet] > tbody > tr:visible").sort(function (a, b) {
 		return a.getElementsByTagName("strong")[0].innerText > b.getElementsByTagName("strong")[0].innerText;
@@ -1091,13 +1091,15 @@ function sortInventory() {
 	console.log(lines)
 	
 	for( var i=0; i<lines.length; i++) {
-		tbody.innerHTML += lines[i].outerHTML;
+		new_tbody.innerHTML += lines[i].outerHTML;
 	}
 	
-	console.log(tbody)
+	console.log(new_tbody)
 	
-	
-	document.getElementById("inventaire_complet").getElementsByTagName("tbody")[0] = tbody;
+	let table = document.getElementById("inventaire_complet");
+	let tbody = table.getElementsByTagName("tbody")[0];
+	table.removeChild(tbody);
+	table.appendChild(new_tbody);
 }
 	
 
@@ -1213,7 +1215,7 @@ function applyInventoryFilters() {
 	});
 	
 	// sortInventory();
-	ungroupInventoryEntries();
+	// ungroupInventoryEntries();
 }
 
 function toggleInventoryGrouping() {
