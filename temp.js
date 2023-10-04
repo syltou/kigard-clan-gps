@@ -122,7 +122,7 @@ if(page == "formules") {
 
 if (page == "inventaire" && inv != undefined) { //(inv == "Equipement" || inv == "Consommable" || inv == "Ressource")) {
     console.log("Save inventory "+inv);
-	saveInventory(inv);
+	saveInventory2(inv);
 	let bloc = document.getElementById("bloc");
 	addCopyButton(bloc.getElementsByTagName("table")[0],"inventory");
 }
@@ -782,6 +782,8 @@ function updateTableTitle() {
 	if(nombre==0) nombre = "Aucune";
 	
 	$("table:first").children("tbody:first").children("tr:first").children("td:first")[0].innerText = nombre + " formule" + s;
+	$("table:first").find("td").removeClass("clair");
+	$("table:first").find("tr:visible:odd > td").addClass("clair");
 }
 
 function listComponents() {
@@ -856,18 +858,63 @@ function saveInventory(inv) {
 	console.log("Saved "+ inv);
 }
 
-function saveInventory2(url) {
-	window.open("index.php?p=inventaire&genre=Tenue",'_self');
-	if(confirm("Next page ?")==true){
-		window.open("index.php?p=inventaire&genre=Equipement",'_self');
-		if(confirm("Next page ?")==true){
-			window.open("index.php?p=inventaire&genre=Consommable",'_self');
-			if(confirm("Next page ?")==true){
-				window.open("index.php?p=inventaire&genre=Ressource",'_self');
-			}
-		}
-	}
+
+function saveInventory2(inv) {
+	let icon = $("<td></td>").append( $("<img>").attr("src","images/items/169.gif") )
+	let lines = $("table tbody tr td:nth-child(2)").parent().clone().each(processInventoryLine);
+	lines.attr("data-inv", inv);
+	lines.attr("data-place", 'Inventaire');
+	icon.appendTo(lines);
+
+	let table = $("<table></table>").append( $("<tbody></tbody>").append(lines) );	
+	// for(var i=0; i<cells.length; i++) {
+		// let line = $('<tr/>',{
+						// "data-inv": inv,
+						// "data-place": 'Inventaire'
+					// });
+		// icon.appendTo(line);
+		// cells[i].appendTo(line);
+		// line.appendTo(table);
+	// }
+	
+	console.log(table);
+	
+	$(table).find("td").removeClass("clair");
+	$(table).find("tr:even > td").addClass("clair");
+	
+	table.insertAfter( $("table")[0] );
+	
 }
+	
+	
+
+function processInventoryLine() {
+	$(this).find("td:first").remove();
+	$(this).find("td:last").remove();
+	let name = $(this).find("strong:first");
+	let serti = $(name).find(".sertissage");
+	let enchant = $(name).find(".enchantement");
+	$(name).find(".sertissage").remove();
+	$(name).find(".enchantement").remove();
+	let item = $(name).text();
+	let quali = "";
+	if(item.includes("de maître")) {
+		item = item.split("de maître")[0];
+		quali = "de maître ";
+	}
+	else if (item.includes("de qualité")) {
+		item = item.split("de qualité")[0];
+		quali = "de qualité ";
+	} 
+	$(name).text("");
+	$(name).append(enchant);
+	$(name).append( $("<span></span>").addClass("name") );
+	$(name).append( $("<span></span>").addClass("qualite").attr("style","font-style:italic") );
+	$(name).append(serti);
+	$(this).find(".name").text(item);
+	$(this).find(".qualite").text(quali);
+}
+
 
 function saveMulet(mule) {
 	var i, lines, cell, table, inv;
@@ -1207,6 +1254,8 @@ function selectInventoryMules() {
 
 function applyInventoryFilters() {
 	
+	ungroupInventoryEntries();
+	
 	let selected_mules = [];
 	$("a[data-place][class=sel]").each(function () {  selected_mules.push($(this).data('place')) });
 	// selected_mules.push('Inventaire');
@@ -1225,8 +1274,7 @@ function applyInventoryFilters() {
 		}
 	});
 	
-	sortInventory();
-	// ungroupInventoryEntries();
+	sortInventory(); 
 }
 
 function toggleInventoryGrouping() {
