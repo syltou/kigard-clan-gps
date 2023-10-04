@@ -1080,26 +1080,37 @@ function createInventory() {
 
 function sortInventory() {
 	
-	let new_tbody = document.createElement("tbody");
-	new_tbody.id = "sorted_table";
-	new_tbody.innerHTML = "";
+	// let new_tbody = document.createElement("tbody");
+	// new_tbody.id = "sorted_table";
+	// new_tbody.innerHTML = "";
 	
-	let lines = $("table[id=inventaire_complet] > tbody > tr:visible").sort(function (a, b) {
-		return a.getElementsByTagName("strong")[0].innerText > b.getElementsByTagName("strong")[0].innerText;
+	// let lines = $("table[id=inventaire_complet] > tbody > tr:visible").sort(function (a, b) {
+		// return a.getElementsByTagName("strong")[0].innerText > b.getElementsByTagName("strong")[0].innerText;
+	// });
+	
+	var tbody = $("#inventaire_complet").find("tbody")
+	var rows = tbody.children().detach().get();
+	
+	rows.sort(function (a, b) {
+		let $a = a;
+		// $($a).find("strong .sertissage").hide();
+		// $($a).find("strong .enchantement").hide()
+		let $b = b;
+		// $($b).find("strong .sertissage").hide()
+		// $($b).find("strong .enchantement").hide()
+		return $a.innerText > $b.innerText;
 	});
 	
-	console.log(lines)
+	// for( var i=0; i<lines.length; i++) {
+		// new_tbody.innerHTML += lines[i].outerHTML;
+	// }
 	
-	for( var i=0; i<lines.length; i++) {
-		new_tbody.innerHTML += lines[i].outerHTML;
-	}
+	tbody.append(rows);
 	
-	console.log(new_tbody)
-	
-	let table = document.getElementById("inventaire_complet");
-	let tbody = table.getElementsByTagName("tbody")[0];
-	table.removeChild(tbody);
-	table.appendChild(new_tbody);
+	// let table = document.getElementById("inventaire_complet");
+	// let tbody = table.getElementsByTagName("tbody")[0];
+	// table.removeChild(tbody);
+	// table.appendChild(new_tbody);
 }
 	
 
@@ -1214,7 +1225,7 @@ function applyInventoryFilters() {
 		}
 	});
 	
-	// sortInventory();
+	sortInventory();
 	// ungroupInventoryEntries();
 }
 
