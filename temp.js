@@ -129,7 +129,7 @@ if (page == "inventaire" && inv != undefined) { //(inv == "Equipement" || inv ==
 
 if (page == "gestion_stock") {
 	let mule = urlParams.get('id_monstre');
-	saveMulet(mule);
+	saveMulet2(mule);
 	let bloc = document.getElementById("bloc");
 	addCopyButton(bloc.getElementsByTagName("table")[0],"inventory");
 }
@@ -860,32 +860,21 @@ function saveInventory(inv) {
 
 
 function saveInventory2(inv) {
-	let icon = $("<td></td>").append( $("<img>").attr("src","images/items/169.gif") )
-	let lines = $("table tbody tr td:nth-child(2)").parent().clone().each(processInventoryLine);
-	lines.attr("data-inv", inv);
-	lines.attr("data-place", 'Inventaire');
-	icon.appendTo(lines);
 
-	let table = $("<table></table>").append( $("<tbody></tbody>").append(lines) );	
-	// for(var i=0; i<cells.length; i++) {
-		// let line = $('<tr/>',{
-						// "data-inv": inv,
-						// "data-place": 'Inventaire'
-					// });
-		// icon.appendTo(line);
-		// cells[i].appendTo(line);
-		// line.appendTo(table);
-	// }
-	
-	console.log(table);
-	
-	$(table).find("td").removeClass("clair");
-	$(table).find("tr:even > td").addClass("clair");
-	
-	table.insertAfter( $("table")[0] );
-	
+	let lines = $("table tbody tr td:nth-child(2)").parent().clone()
+				.each(processInventoryLine)
+				.attr("data-inv", inv)
+				.attr("data-place", 'Inventaire')
+				.append( $("<td></td>").append( $("<img>").attr("src","images/items/169.gif") ));
+
+	let table = $("<table></table>").append( $("<tbody></tbody>").append(lines) ).insertAfter( $("table")[0] );
+	localStorage.setItem(inv,JSON.stringify(lines.parent().html()));
+	let ts = (new Date()).getTime();
+	localStorage.setItem(inv+'_ts',ts);
+	console.log("Saved "+ inv);
 }
-	
+		// $(table).find("td").removeClass("clair");
+	// $(table).find("tr:even > td").addClass("clair");
 	
 
 function processInventoryLine() {
@@ -935,11 +924,85 @@ function saveMulet(mule) {
 			table += "</tr>";
 		}
 	}
+	
+	
 	localStorage.setItem(mule,table);
 	let ts = (new Date()).getTime();
 	localStorage.setItem(mule+'_ts',ts);
 	console.log("Saved mulet "+ mule);
 }
+
+function saveMulet2(mule) {
+	// var i, lines, cell, table, inv;
+	// lines = document.getElementsByTagName('table')[0].getElementsByClassName("item");
+	// console.log($("h3")[0].innerText )
+	// table = "";
+	// for (i=0;i<lines.length;i++){
+		// if(lines[i].parentNode.tagName == "TD") {
+
+			// let icon = lines[i].src.split('items/')[1].split('.gif')[0];
+			// if (id_equip.includes(~~icon)) inv = "Equipement";
+			// if (id_conso.includes(~~icon)) inv = "Consommable";
+			// if (id_resso.includes(~~icon)) inv = "Ressource";
+
+			// table += "<tr data-inv='" + inv + "' data-place='" + mule + "'>";
+			// cell = lines[i].parentNode.outerHTML;
+			// table += cell;
+			// table += "</tr>";
+		// }
+	// }
+	
+	let lines = $("table tbody tr td:first-child").parent().clone()
+				.each(processMuleLine)
+				.attr("data-place", mule)
+				.append( $("<td></td>").append( $("<img>").attr("src","images/vue/monstre/37.gif") ) );
+	
+	let table = $("<table></table>").append( $("<tbody></tbody>").append(lines) ).insertAfter( $("table")[0] );
+	localStorage.setItem(mule,JSON.stringify(lines));
+	let ts = (new Date()).getTime();
+	localStorage.setItem(mule+'_ts',ts);
+	console.log("Saved mulet "+ mule);
+}
+
+
+function processMuleLine() {
+	// $(this).find("td:first").remove();
+	$(this).find("td:last").remove();
+	let name = $(this).find("strong:first");
+	let serti = $(name).find(".sertissage");
+	let enchant = $(name).find(".enchantement");
+	$(name).find(".sertissage").remove();
+	$(name).find(".enchantement").remove();
+	let item = $(name).text();
+	let quali = "";
+	if(item.includes("de maître")) {
+		item = item.split("de maître")[0];
+		quali = "de maître ";
+	}
+	else if (item.includes("de qualité")) {
+		item = item.split("de qualité")[0];
+		quali = "de qualité ";
+	} 
+	$(name).text("");
+	$(name).append(enchant);
+	$(name).append( $("<span></span>").addClass("name") );
+	$(name).append( $("<span></span>").addClass("qualite").attr("style","font-style:italic") );
+	$(name).append(serti);
+	$(this).find(".name").text(item);
+	$(this).find(".qualite").text(quali);
+	
+	let icon = $(this).find("img:first").attr("src").split('items/')[1].split('.gif')[0];
+	let inv = undefined
+	if (id_equip.includes(~~icon)) inv = "Equipement";
+	if (id_conso.includes(~~icon)) inv = "Consommable";
+	if (id_resso.includes(~~icon)) inv = "Ressource";
+	
+	$(this).attr("data-inv", inv)
+	
+
+}
+
+
 
 
 function mergeInventory() {
@@ -991,6 +1054,50 @@ function mergeInventory() {
 	return merged;
 
 }
+
+
+function mergeInventory2() {
+
+	let i, table, temp;
+	temp = localStorage.getItem("mules_id");
+	let mules_id = temp ? temp.split(',') : [];
+
+	let inv_to_show = ["Tenue","Equipement","Consommable","Ressource"];
+
+	let merged = $("<table></table>")
+				.attr("id","inventaire_complet")
+				.attr("width","100%")
+				.append( $("<tbody></tbody>") );
+				
+	for(i=0; i<inv_to_show.length; i++){
+		let lines = JSON.parse(localStorage.getItem(inv_to_show[i]));
+		if(lines==null){
+			$(merged).find("tbody").append( $("<div>Visitez d'abord la page " + inv_to_show[i] + " !</div>") );
+		}
+		else {
+			$(merged).find("tbody").html(lines);
+		}
+	}
+	for(i=0; i<mules_id.length; i++){
+		let lines = JSON.parse(localStorage.getItem(mules_id[i]));
+		let mule;
+		if(lines==null){
+			if(mules_name[i]=="Mulet") mule=mules_id[i];
+			else mule=mules_name[i];
+			$(merged).find("tbody").append( $("<div>Visitez d'abord l'inventaire du mulet " + mule + " !</div>") );
+		}
+		else {
+			$(merged).find("tbody").html(lines);
+		}
+	}
+
+	return merged;
+
+}
+
+
+
+
 
 function createInventory() {
 	// let state_eq, state_co, state_re, show_mules;
@@ -1108,11 +1215,14 @@ function createInventory() {
 	}
 	// -------------------------------------------------------------------
 
-	let table = mergeInventory();
-	myhtml += table;
+	// let table = mergeInventory();
+	// myhtml += table;
 
 	let bloc = document.getElementById("bloc");
 	bloc.innerHTML = myhtml;
+	
+	let table = mergeInventory2();
+	$("div.filtres:last").after(table);
 
 	addCopyButton(document.getElementById("inventaire_complet"),'inventory');
 	
