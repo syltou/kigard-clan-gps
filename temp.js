@@ -39,7 +39,7 @@ var test = Object();
 var components = [];
 var components_alt = [];
 var members = [];
-var mypos, myname;
+var mypos, myname, myskin;
 var listNames, buttons;
 const queryString = window.location.search;
 const urlParams = new URLSearchParams(queryString);
@@ -84,6 +84,18 @@ mypos = parsePosition(top[0].innerText.trim());
 let name = document.getElementsByTagName("strong");
 myname = name[0].innerText.trim();
 
+
+if (page == "vue"){
+	
+	$(document).ready( function() {
+		myskin = $("div[class='cellule filtre clic']").parent().find("img:first").attr("src");
+		if (myskin == undefined) myskin="images/vue/pj/HumainF.gif";	
+		localStorage.setItem('myskin',myskin);
+	});
+	
+	console.log(myskin);
+}
+
 if (page == "exploration") {
 	
 	saveInventory2("index.php?p=inventaire&genre=Equipement");
@@ -122,7 +134,12 @@ if(page == "formules") {
 
 if (page == "inventaire" && inv != undefined) { //(inv == "Equipement" || inv == "Consommable" || inv == "Ressource")) {
     console.log("Save inventory "+inv);
-	saveInventory2(inv);
+	if(inv=="Tenue") {
+		saveTenue();
+	}
+	else {
+		saveInventory2(inv);
+	}
 	let bloc = document.getElementById("bloc");
 	addCopyButton(bloc.getElementsByTagName("table")[0],"inventory");
 }
@@ -867,19 +884,55 @@ function saveInventory2(inv) {
 				.attr("data-place", 'Inventaire')
 				.append( $("<td></td>").append( $("<img>").attr("src","images/items/169.gif") ));
 
-	let table = $("<table></table>").append( $("<tbody></tbody>").append(lines) ).insertAfter( $("table")[0] );
-	localStorage.setItem(inv,JSON.stringify(lines.parent().html()));
+	$("<table ></table>")
+		.append( $("<tbody id='temp'></tbody>").append(lines) )
+		.insertAfter( $("table")[0] )
+		.hide();
+	
+	localStorage.setItem(inv,document.getElementById('temp').innerHTML);
 	let ts = (new Date()).getTime();
 	localStorage.setItem(inv+'_ts',ts);
 	console.log("Saved "+ inv);
 }
-		// $(table).find("td").removeClass("clair");
-	// $(table).find("tr:even > td").addClass("clair");
+		
 	
+function saveTenue() {
+
+	let myskin = localStorage.getItem('myskin');
+
+	var linesTenue = $("table:first tbody tr td:nth-child(2)").parent().clone()
+				.each(processInventoryLine)
+				.attr("data-inv", 'Equipement')
+				.attr("data-place", 'Tenue')
+				.append( $("<td></td>").append( $("<img>").attr("src",myskin) ));
+	var linesCeinture = undefined;
+
+	if ( $("table:last")[0] != $("table:first")[0] ) {
+		linesCeinture = $("table:last tbody tr td:nth-child(2)").parent().clone()
+				.each(processInventoryLine)
+				.attr("data-inv", 'Equipement')
+				.attr("data-place", 'Tenue')
+				.append( $("<td></td>").append( $("<img>")
+													.attr("src",myskin)
+													.attr("style","opacity:0.4")));
+	}
+
+	$("<table ></table>")
+		.append( $("<tbody id='temp'></tbody>").append(linesTenue).append(linesCeinture) )
+		.insertAfter( $("table:last")[0] )
+		.hide();
+	
+	
+	localStorage.setItem(inv,document.getElementById('temp').innerHTML);
+	let ts = (new Date()).getTime();
+	localStorage.setItem(inv+'_ts',ts);
+	console.log("Saved "+ inv);
+}
+
 
 function processInventoryLine() {
 	$(this).find("td:first").remove();
-	$(this).find("td:last").remove();
+	if( $(this).find("td").length>1 ) $(this).find("td:last").remove();
 	let name = $(this).find("strong:first");
 	let serti = $(name).find(".sertissage");
 	let enchant = $(name).find(".enchantement");
@@ -898,7 +951,7 @@ function processInventoryLine() {
 	$(name).text("");
 	$(name).append(enchant);
 	$(name).append( $("<span></span>").addClass("name") );
-	$(name).append( $("<span></span>").addClass("qualite").attr("style","font-style:italic") );
+	$(name).append( $("<span></span>").addClass("qualite").attr("style","font-style:italic; color:#B18A17") );
 	$(name).append(serti);
 	$(this).find(".name").text(item);
 	$(this).find(".qualite").text(quali);
@@ -957,8 +1010,12 @@ function saveMulet2(mule) {
 				.attr("data-place", mule)
 				.append( $("<td></td>").append( $("<img>").attr("src","images/vue/monstre/37.gif") ) );
 	
-	let table = $("<table></table>").append( $("<tbody></tbody>").append(lines) ).insertAfter( $("table")[0] );
-	localStorage.setItem(mule,JSON.stringify(lines));
+	$("<table></table>")
+		.append( $("<tbody id='temp'></tbody>").append(lines) )
+		.insertAfter( $("table")[0] )
+		.hide();
+	
+	localStorage.setItem(mule,document.getElementById('temp').innerHTML);
 	let ts = (new Date()).getTime();
 	localStorage.setItem(mule+'_ts',ts);
 	console.log("Saved mulet "+ mule);
@@ -986,7 +1043,7 @@ function processMuleLine() {
 	$(name).text("");
 	$(name).append(enchant);
 	$(name).append( $("<span></span>").addClass("name") );
-	$(name).append( $("<span></span>").addClass("qualite").attr("style","font-style:italic") );
+	$(name).append( $("<span></span>").addClass("qualite").attr("style","font-style:italic; color:#B18A17") );
 	$(name).append(serti);
 	$(this).find(".name").text(item);
 	$(this).find(".qualite").text(quali);
@@ -1107,6 +1164,8 @@ function createInventory() {
 	let mules_id = temp ? temp.split(',') : [];
 	temp = localStorage.getItem("mules_name");
 	let mules_name = temp ? temp.split(',') : [];
+	
+	let myskin = localStorage.getItem('myskin');
 
 	// // console.log(mules_id);
 	// // console.log(mules_name);
@@ -1180,39 +1239,47 @@ function createInventory() {
 	// category_selector.setAttribute('hidden',"true");
 	category_selector.setAttribute('style',"text-align:center;");
 
-	category_selector.innerHTML = '<blockquote class="bloc"><strong>Catégories</strong><br><a href="#" data-inv="Tous" style="font-weight: lighter; font-style: italic"><emph>Aucun</emph></a> '
-		+ '<span><img src="images/interface/puce_small.gif" alt=""> <img src="images/vue/pj/HumainF.gif" class="item"><a href="#" data-inv="Tenue" class="sel">Tenue' + ' (' + formatTime(ts_te) + ') </a> </span> '
-		+ '<span><img src="images/interface/puce_small.gif" alt=""> <img src="images/items/74.gif" class="item"><a href="#" data-inv="Equipement" class="sel">Équipements' + ' (' + formatTime(ts_eq) + ') </a> </span> '
-		+ '<span><img src="images/interface/puce_small.gif" alt=""> <img src="images/items/3.gif" class="item"><a href="#" data-inv="Consommable" class="sel">Consommables' + ' (' + formatTime(ts_co) + ') </a> </span> '
-		+ '<span><img src="images/interface/puce_small.gif" alt=""> <img src="images/items/5.gif" class="item"><a href="#" data-inv="Ressource" class="sel">Ressources' + ' (' + formatTime(ts_re) + ') </a> </span> '
+	category_selector.innerHTML = '<blockquote class="bloc"><strong>Catégories</strong><br>'
+		+ '<a href="#" data-inv="Tous" style="font-weight: lighter; font-style: italic"><emph>Aucun</emph></a> '
+		+ '<span><img src="images/interface/puce_small.gif" alt=""> '
+		+ '<img src="images/items/74.gif" class="item"><a href="#" data-inv="Equipement" class="sel">Équipements' + ' (' + formatTime(ts_eq) + ') </a> </span> '
+		+ '<span><img src="images/interface/puce_small.gif" alt=""> '
+		+ '<img src="images/items/3.gif" class="item"><a href="#" data-inv="Consommable" class="sel">Consommables' + ' (' + formatTime(ts_co) + ') </a> </span> '
+		+ '<span><img src="images/interface/puce_small.gif" alt=""> '
+		+ '<img src="images/items/5.gif" class="item"><a href="#" data-inv="Ressource" class="sel">Ressources' + ' (' + formatTime(ts_re) + ') </a> </span> '
 		+ '</blockquote>';
 	myhtml += category_selector.outerHTML;
 
 	// -------------------------------------------------------------------
 
-	if(mules_id.length>0){
+	let place_selector = document.createElement("div");
+	place_selector.setAttribute('class',"filtres");
+	// place_selector.setAttribute('hidden',"true");
+	place_selector.setAttribute('style',"text-align:center;");
 
-		let mule_selector = document.createElement("div");
-		mule_selector.setAttribute('class',"filtres");
-		// mule_selector.setAttribute('hidden',"true");
-		mule_selector.setAttribute('style',"text-align:center;");
+	placeFilterHTML = '<blockquote class="bloc"><strong>Emplacements</strong><br>'
+		+ '<a href="#" data-place="Tous" style="font-weight: lighter; font-style: italic"><emph>Aucun</emph></a> '
+		+ '<span><img src="images/interface/puce_small.gif" alt=""> '
+		+ '<img src="images/items/169.gif" class="item"><a href="#" data-place="Inventaire" class="sel">Inventaire</a> </span> ';
 
-		mulesHTML = '<blockquote class="bloc"><strong>Emplacements</strong><br><a href="#" data-place="Tous" style="font-weight: lighter; font-style: italic"><emph>Aucun</emph></a> '
-			+ '<span><img src="images/interface/puce_small.gif" alt=""> <img src="images/items/169.gif" class="item"><a href="#" data-place="Inventaire" class="sel">Inventaire</a> </span> ';
 
-		for(i=0; i<mules_id.length; i++) {
-			let name = mules_name[i];
-			let mule_ts = localStorage.getItem(mules_id[i]+"_ts");
-			let ts = null;
-			if(mule_ts) ts = (new Date()).getTime() - mule_ts;
-			mulesHTML += '<span><img src="images/interface/puce_small.gif" alt=""> '
-									+ '<img src="images/vue/monstre/37.gif" class="item">&nbsp;'
-									+ '<a href="#" data-place="' +  mules_id[i] + '" class="sel">' + name + ' (' + formatTime(ts) + ')</a> </span> '
-		}
-		mulesHTML += '</blockquote>';
-		mule_selector.innerHTML = mulesHTML;
-		myhtml += mule_selector.outerHTML;
+	for(i=0; i<mules_id.length; i++) {
+		let name = mules_name[i];
+		let mule_ts = localStorage.getItem(mules_id[i]+"_ts");
+		let ts = null;
+		if(mule_ts) ts = (new Date()).getTime() - mule_ts;
+		placeFilterHTML += '<span><img src="images/interface/puce_small.gif" alt=""> '
+								+ '<img src="images/vue/monstre/37.gif" class="item">&nbsp;'
+								+ '<a href="#" data-place="' +  mules_id[i] + '" class="sel">' + name + ' (' + formatTime(ts) + ')</a> </span> '
 	}
+	
+	placeFilterHTML += '<span><img src="images/interface/puce_small.gif" alt=""> '
+		+ '<img src="' + myskin + '" class="item"><a href="#" data-place="Tenue" class="sel">Tenue/Ceinture (' + formatTime(ts_te) + ') </a> </span> '
+	
+	placeFilterHTML += '</blockquote>';
+	place_selector.innerHTML = placeFilterHTML;
+	myhtml += place_selector.outerHTML;
+	
 	// -------------------------------------------------------------------
 
 	// let table = mergeInventory();
@@ -1221,13 +1288,13 @@ function createInventory() {
 	let bloc = document.getElementById("bloc");
 	bloc.innerHTML = myhtml;
 	
-	let table = mergeInventory2();
+	let table = mergeInventory();
 	$("div.filtres:last").after(table);
 
 	addCopyButton(document.getElementById("inventaire_complet"),'inventory');
 	
 	$('a[data-inv]').click(selectInventoryCategory);
-	$('a[data-place]').click(selectInventoryMules);
+	$('a[data-place]').click(selectInventoryPlace);
 	// $('a[data-inv="Tous"]').attr("class", "sel"); // default selected
 	
 	addGroupButton(document.getElementById("inventaire_complet"))
@@ -1249,13 +1316,26 @@ function sortInventory() {
 	var rows = tbody.children().detach().get();
 	
 	rows.sort(function (a, b) {
-		let $a = a;
-		// $($a).find("strong .sertissage").hide();
-		// $($a).find("strong .enchantement").hide()
-		let $b = b;
-		// $($b).find("strong .sertissage").hide()
-		// $($b).find("strong .enchantement").hide()
-		return $a.innerText > $b.innerText;
+		let inv_a = $(a).data("inv");
+		let inv_b = $(b).data("inv");
+		
+		if ( inv_a == inv_b ) {
+			let $a = $(a).find(".name").text().trim();
+			let $b = $(b).find(".name").text().trim();
+			return $a > $b;
+		}
+		else {
+			if( inv_a == "Equipement" ) {
+				return -1;
+			}
+			else if( inv_a == "Consommable" ) {
+				if (inv_b == "Equipement") return 1;
+				else return -1;
+			}
+			else {
+				return 1;
+			}
+		}
 	});
 	
 	// for( var i=0; i<lines.length; i++) {
@@ -1317,7 +1397,7 @@ function selectInventoryCategory() {
 }
 
 
-function selectInventoryMules() {
+function selectInventoryPlace() {
 
 	if($(this).data('place')=='Tous'){
 		if($(this).text()=='Tous') {
@@ -1385,6 +1465,9 @@ function applyInventoryFilters() {
 	});
 	
 	sortInventory(); 
+	
+	$("#inventaire_complet").find("td").removeClass("clair");
+	$("#inventaire_complet").find("tr:visible:even > td").addClass("clair");
 }
 
 function toggleInventoryGrouping() {
@@ -1542,7 +1625,7 @@ function addCopyButton(table,type) {
 function copyListInventory() {
 
 	// navigator.clipboard.writeText($("table:first").children("tbody:first").children("tr:visible").find("strong").each(function(){$(this).text($(this).text()+'\n')}).text());
-	navigator.clipboard.writeText($("tr:visible > td > strong").each(function(){$(this).text($(this).text()+'\n')}).text());
+	navigator.clipboard.writeText($("tr:visible strong:nth-child(2)").clone().each(function(){$(this).text($(this).text()+'\n')}).text().trim());
 }
 
 function copyListFormulas() {
