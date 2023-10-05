@@ -4,7 +4,7 @@
 // @contributor Ciol <ciolfire@gmail.com> (100% inspiré de Kigard Fashion Script)
 // @contributor
 // @description Un script facilitant la localisation des membres du clan
-// @version 0.9.0
+// @version 0.9.9
 // @grant GM_addStyle
 // @match https://tournoi.kigard.fr/*
 // @exclude
